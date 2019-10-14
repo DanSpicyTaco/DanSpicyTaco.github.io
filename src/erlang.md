@@ -36,25 +36,29 @@ Disadvntages:
 - Lists [] - store variable number of items
 
 ### Pattern Matching
-_Head/Tail Matching_: In [A|B], the first item is bound to A, the rest is bound to B (can be an empty string)
-> `[A,B|C] = [1,2,3,4,5,6,7]`
-> Binds A = 1, B = 2, C = [3,4,5,6,7]
+- _Head/Tail Matching_: In [A|B], the first item is bound to A, the rest is bound to B (can be an empty string)  
+> `[A,B|C] = [1,2,3,4,5,6,7]`  
+> Binds A = 1, B = 2, C = [3,4,5,6,7]  
 
-_Generator_: `Variable <- List` - iterate through each element in the list as X
-_Filter_: conditional statement
-_List comprehensions_: `[Variable ||  Generator, Filter]` - create new list based on generators and filters
-> `Foods = [{hotdog, dislike}, {beef, dislike}, {chicken, like}, {spaghetti, like}, {curry, like}].`
-> `Likes = [X || {X, like} <- Foods].`
-> Likes contains [chickem, spaghetti, curry]
+- _Generator_: `Variable <- List` - iterate through each element in the list as X
+- _Filter_: conditional statement
+- _List comprehensions_: `[Variable ||  Generator, Filter]` - create new list based on generators and filters
+> `Foods = [{hotdog, dislike}, {beef, dislike}, {chicken, like}, {spaghetti, like}, {curry, like}].`  
+> `Likes = [X || {X, like} <- Foods].`  
+> Likes contains [chickem, spaghetti, curry]  
 
 ### Functions
-Clauses - scanned until match is found
-Call using - module:func(Args)
-Export function to be used elsewhere: -export([func]/Args).
+- _Clause_: function statement - is scanned until match is found
+> `factorial(0) -> 1;` 
+> `factorial(N) -> N * factorial(N-1).` 
+> Here, factorial(0) and factorial(N) are function clauses 
 
+- _Anonymous Functions_: functions are defined like variables, so they can be used like variables
+> `F = fun(X) -> X*2 end.`
 
 ## Concurrent programming
-Create new process that completes one function - Pid = spawn(Mod, Func, Args)
+- Create new process that completes one function 
+> `Pid = spawn(Mod, Func, Args)`
 
 
 ## Resources

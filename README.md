@@ -1,5 +1,12 @@
-# Docs - Because Repos are free and Jira isn't
-## Index
-- [Bash](/bash.md): Commands and Scripting
-- [$PATH](/path.md): Where to find exports & tips/tricks
-- [pyenv](/pyenv.md): Installing new python versions and managing virtualenvs
+# Docs
+## Programming
+### Erlang
+- [erlang](/src/erlang.md): notes and cheatsheet
+
+### Python
+- [pyenv](/src/pyenv.md): Installing new python versions and managing virtualenvs
+
+### Terminal
+- [bash](/src/bash.md): Commands and Scripting
+- [$PATH](/src/path.md): Where everything is & tips/tricks
+- [ssh](/src/ssh.md): SSH notes
