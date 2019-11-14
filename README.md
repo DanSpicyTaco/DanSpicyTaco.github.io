@@ -1,15 +1,20 @@
 # docs
 ## Programming
+### Bash
+- [bash](/src/bash.md): Commands and Scripting
+- [$PATH](/src/path.md): Where everything is & tips/tricks
+
 ### Erlang
-- [erlang](/src/erlang.md): notes and cheatsheet
+- [notes](/src/erlang.md): notes and cheatsheet
+
+### Markdown
+- [Markdown](/src/markdown.md): Markdown cheatsheet ([Source](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet))
 
 ### Python
 - [pyenv](/src/pyenv.md): Installing new python versions and managing virtualenvs
 
-## Terminal
-- [bash](/src/bash.md): Commands and Scripting
-- [$PATH](/src/path.md): Where everything is & tips/tricks
+## Networking
 - [ssh](/src/ssh.md): SSH notes
 
-## Miscellaneous
-- [Markdown](/src/markdown.md): Markdown cheatsheet ([Source](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet))
+## Distributed Systmes
+- coming soon!
