@@ -1,4 +1,4 @@
-# Docs
+# docs
 ## Programming
 ### Erlang
 - [erlang](/src/erlang.md): notes and cheatsheet
