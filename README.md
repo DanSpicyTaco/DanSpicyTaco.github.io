@@ -17,8 +17,8 @@
 - [ssh](/src/ssh.md): SSH notes
 
 ## Distributed Systems
-- [Distributed Systems](/src/dist/dist_sys.md): An Introduction to Distributed Systems
-- [Replication & Consistency](/src/dist/repl_cons.md)
+- [Distributed Systems](/src/distributed_systems/distributed_systems.md): An Introduction to Distributed Systems
+- [Replication & Consistency](/src/distributed_systems/replication.md)
 
 ## Cloud Computing
 - coming soon!
