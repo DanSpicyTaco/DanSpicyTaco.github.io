@@ -47,4 +47,9 @@ Operations are not instantaneous:
 
 ## Consistency
 
--
+Consistency requires two things:
+
+- _Timing_: how old is the data allowed to be?
+- _Operation Ordering_: in what order were operations performed?
+
+Time consistency can be ensured through _versioning_.
