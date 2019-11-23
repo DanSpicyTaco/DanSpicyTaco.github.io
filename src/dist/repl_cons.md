@@ -14,9 +14,14 @@ There are two forms of replication: data and control replication.
 
 _Data replication_ involves either mirroring or caching data.
 _Mirroring_ is where the disk storage is copied to other servers (for example, FTP server replication).
+
 _Caching_ is where the data served is stored by intermediate nodes.
 In general, the service providers control mirrored servers, and network providers and clients control caching.
 Servers push updates to its mirrors, while caches pull updates from servers.
+
+|            Mirroring            |           Caching           |
+| :-----------------------------: | :-------------------------: |
+| ![mirroring](img/mirroring.png) | ![caching](img/caching.png) |
 
 _Control replication_ is horizontal scaling - replicating the services a machine provides.
 
@@ -25,3 +30,21 @@ Reads and writes must be synchronised between nodes.
 
 ### Distributed Data Store
 
+Distributed data stores use data replication to achieve high reliability, performance and scalability.
+Each replica contains a _replica manager_ that is in charge of ensuring data consistency and propagating updates.
+
+|      Distributed Data Store       |
+| :-------------------------------: |
+| ![data-store](img/data-store.png) |
+
+Clients will always be connected to one replica at a time.
+A client will be able to do a read or write operation on the data store.
+Operations are not instantaneous:
+
+- _Time of issue_: when a client sends a request to the store.
+- _Time of execution_: when a request is executed by a replica.
+- _Time of completion_: when all replicas have been notified of the request and a reply is returned to the client.
+
+## Consistency
+
+-
