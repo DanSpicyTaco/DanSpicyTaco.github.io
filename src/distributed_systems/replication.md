@@ -1,4 +1,22 @@
-# Replication & Consistency
+# Replication & Consistency <!-- omit in toc -->
+
+## Table of Contents <!-- omit in toc -->
+
+- [Replication](#replication)
+  - [Distributed Data Store](#distributed-data-store)
+- [Consistency](#consistency)
+- [Data-Centric Consistency](#data-centric-consistency)
+  - [Strict consistency](#strict-consistency)
+  - [Linear consistency](#linear-consistency)
+  - [Sequential consistency](#sequential-consistency)
+  - [Causal consistency](#causal-consistency)
+  - [FIFO (PRAM) Consistency](#fifo-pram-consistency)
+  - [Weak Consistency](#weak-consistency)
+  - [Release Consistency](#release-consistency)
+  - [Entry Consistency](#entry-consistency)
+  - [Eventual Consistency](#eventual-consistency)
+- [CAP Theory](#cap-theory)
+- [Client-Centric Consistency](#client-centric-consistency)
 
 ## Replication
 
@@ -78,6 +96,8 @@ Fortunately, _consistency models_ can help with choosing a total order by defini
 Consistency models are either _data-centric_ or _client-centric_.
 It's up to the system designer to choose which consistency model to use.
 
+## Data-Centric Consistency
+
 ### Strict consistency
 
 **Any read returns the most recent write**.
@@ -131,4 +151,65 @@ As a result, it is one of the most common consistency models used in practice.
 **Program order is maintained**.
 
 Only the writes on each client is consistent.
-This will create discrepancy
+This will create discrepancies between clients, as no total order is enforced.
+
+### Weak Consistency
+
+**Guarantees consistency after a _synchronise()_ operation**.
+
+When a _synchronise()_ operation occurs, groups of write operations are propagated to all other nodes as updates.
+Updates are organised in sequential order between the nodes.
+Once all the updates have been accounted for, read/write operations can continue.
+
+### Release Consistency
+
+**\*Uses _acquire()_ and _release()_ to synchronise operations**.
+
+Use _acquire()_ to collect updates from other nodes and _release()_ to send updates to other nodes.
+All operations between acquire and release define the critical region.
+Operations are only FIFO consistent, as a node can acquire updates in any order, therefore consistency between nodes is not guaranteed.
+
+As updates are sent to all nodes on release, a node that does not acquire regularly will have their message queue filled.
+A solution to this is using _lazy release_ consistency.
+Here, acquire will ask each node for its latest update.
+This reduces network traffic and does not fill up message queues unnecessarily.
+
+### Entry Consistency
+
+**Synchronisation attached to shared objects**
+
+Can use _acquire()_ and _release()_ (as RMI calls) to access object.
+Object itself is not sent over the network, only synchronisation primitives.
+If the node who owns the object crashes, or if there is a network partition, the object cannot be accessed.
+
+### Eventual Consistency
+
+**Given no updates, all replicas will eventually have the same data**
+
+For this to work, a small amount of read-write conflicts and even less write-write conflicts are tolerated.
+Works well in a single writer, multiple readers scenario.
+Client has to accept some level of time inconsistency.
+An example of where this is implemented is with _DNS_ - changes to a record will take time to update, but it will reach eventual consistency.
+
+## CAP Theory
+
+You can only have two of the three properties:
+
+- _Consistency_: data remains consistent (up to linear consistency).
+- _Accessibility_: more than one replica can be accessed.
+- _Partition Tolerance_: can survive part of a network going down.
+
+**Proof**: Say you are reading from one replica and writing to another. If a network partition occurs between them, you have three choices:
+
+- _AP_: Access to both replicas are maintained, but your writes won't propagate to the other replica.
+- _CP_: Access to one replica is lost, but consistency is maintained as there is only one replica to write to.
+- _CA_: Access to both replicas are maintained, but data becomes read-only (i.e. not writes allowed) to maintain consistency.
+
+|                  AP                  |                 CP                 |                 CA                 |
+| :----------------------------------: | :--------------------------------: | :--------------------------------: |
+| ![mirroring](img/replication/ap.png) | ![caching](img/replication/cp.png) | ![caching](img/replication/ca.png) |
+
+In general, we want partition tolerance, so it becomes a choice between consistency and accessibility.
+If we assume network partitions are short, then we can have accessibility, partition tolerance and eventual consistency without breaking the CAP theory.
+
+## Client-Centric Consistency
