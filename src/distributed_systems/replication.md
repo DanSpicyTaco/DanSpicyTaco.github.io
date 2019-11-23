@@ -67,7 +67,7 @@ In general, time consistency is not a big issue.
 Order consistency is more difficult to ensure, as **replicas can create conflicting operations**.
 Operation ordering can have _strong order_ or _weak order_.
 Strong order is where all writes are performed in the order they appear in.
-This requires a global clock, so it's practically impossible to implement.
+This usually requires a global clock, so it's practically impossible to implement.
 Weak order is where groups of writes are performed in a specific order.
 Members of a group can be unordered, making it easier to implement.
 
@@ -80,7 +80,55 @@ It's up to the system designer to choose which consistency model to use.
 
 ### Strict consistency
 
-__Any read returns the most recent write__.
+**Any read returns the most recent write**.
 
 Strict consistency requires an absolute time ordering.
 As a result, it requires a global clock and instantaneous communication, making it impossible to implement in a distributed system.
+
+### Linear consistency
+
+**Operations are ordered according to a global timestamp**.
+
+Linear consistency uses a global timestamp to order events.
+All events are done in the same order, although instantaneous network communication is not required.
+Requires a global clock, making it impossible to implement practically.
+
+### Sequential consistency
+
+**Clients see write operations in the same order**.
+
+Write operations can be done in any order, as long as they are consistent between all clients - this allows for many valid total orderings.
+Sequential consistency does not require a global timestamp, making it possible to implement.
+It's possible to optimise communication for either reads or writes, but not both.
+This results in a performance limitation of the other (read or write).
+
+|            Sequential Consistency             |
+| :-------------------------------------------: |
+| ![sequential](img/replication/sequential.png) |
+
+### Causal consistency
+
+**Causally related writes are stored in order**.
+
+Two operations are _causally related_ if one operation had to have happened before the other.
+There are two cases for casual relation to occur:
+
+- A read must happen before a write on the same client.
+  For example, R(x)a must happen before W(x)b to make logical sense.
+- A write must happen before a read on different clients.
+  For example, W(x)c must happen before R(x)c to make logical sense.
+
+|          Causal Consistency           |
+| :-----------------------------------: |
+| ![causal](img/replication/causal.png) |
+
+Causal consistency provides stronger consistency than other models, while being practical to achieve.
+Furthermore, it can survive network partitioning
+As a result, it is one of the most common consistency models used in practice.
+
+### FIFO (PRAM) Consistency
+
+**Program order is maintained**.
+
+Only the writes on each client is consistent.
+This will create discrepancy
