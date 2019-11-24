@@ -29,6 +29,8 @@
   - [Local-Write Protocols](#local-write-protocols)
   - [Active Replication Protocol](#active-replication-protocol)
   - [Quorum-Based Protocol](#quorum-based-protocol)
+- [Update Propagation](#update-propagation)
+- [Replica Placement](#replica-placement)
 
 ## Replication
 
@@ -361,17 +363,91 @@ The protocol also provides reliability, as the data is replicated to other serve
 
 ### Active Replication Protocol
 
-Active replication: writes propagate to replicas, reads performed locally
-Requires multicast messaging in total order
-Sequencer required to sequence messages in total order - not scalable
+Writes propagate to all replicas by a coordinator, while reads are performed locally.
+Requires total ordered multicast to achieve sequential consistency.
+The coordinator can add a sequence number to each write before multicast, although this leads to high overhead.
+Not scalable, as there is the centralisation problem at the coordinator.
 
 **[top](#table-of-contents)**
 
 ### Quorum-Based Protocol
 
-Quorum-based protocols: replicas voting on what to write or read next
-Every round of voting is a version
-At least one replica must want to read and write to the data so the read quorum and write quorum overlap - Nr + Nw > N
-Want at least half of the replicas in the write quorum to guarantee the client contacts a replica with the latest version number - Nw > N/2
+For every read/write operation, the client contacts a subset of replicas, who vote (saying yes or no) to completing the operation locally.
+All data has a version number attached to it, when it is modified, the version number increases.
+The protocol defines the minimum number of votes an operation has to succeed, called the _read quorum_ or _write quorum_.
+There are two rules the quorums have to follow:
+
+- _Nr + Nw > N_: read + write quorums must be greater than the total number of replicas.
+  This ensures the client will contact a node with the most recent data (i.e. the highest version number).
+- _Nw > N/2_: at least half of the replicas must vote yes for the data to be updated.
+  This ensures the next read or write will contain the most recent data.
+  Furthermore, this avoids write-write conflicts.
+
+For example, a data store has a read quorum of Nr = 3, a write quorum of Nw = 10 and N = 12.
+If the client wants to read, 3 replicas must vote yes to the request.
+This guarantees at least one of the replicas will have the most recent data on it.
+If the client wants to write, 10 replicas must vote yest to the request.
+The next time a client tries to read or write, at least one replica with the most recent data will be contacted.
+
+|         Quorum-Based Protocol         |
+| :-----------------------------------: |
+| ![Quorum](img/replication/quorum.png) |
+
+Guarantees sequential consistency without a coordinator or multicast, and is possible to scale well.
+Performance may not be great as there is a lot of overhead required in each voting stage.
+The choice of quorum sizes depends on the expected read-write ratio and the cost of group communication.
+
+**[top](#table-of-contents)**
+
+## Update Propagation
+
+Replicas need a way to propagate updates to data.
+
+_Pull updates_ send a read request to the data store when required.
+It is a good method for data that has many writes but few reads.
+
+On the other hand, _push updates_ sends an update to all replicas when a write request occurs.
+This requires the data store to keep track of all replicas - including unstable ones like browser caches.
+While this ensures low staleness of data, there is a lot of overhead.
+Push updates generally come as multicast or unicast.
+A push update can come in the form:
+
+- _Data push_: the updated data is propagated.
+  This is only good for small data or updates that are infrequent.
+- _Operation push_: the operation which lead to the updated data is propagated.
+  Good for low bandwidth, as a set of operations is smaller than a large data item.
+  However, this method requires more distributed power.
+- _Invalidation push_: data is invalidated and the replica has to send a pull request.
+  This is good for low bandwidth and frequent updates.
+  However, this has to be used with a pull request to get new data.
+
+A solution to the overhead issue in push updates are using _leases_.
+_Example scenario_: a cache can request a lease from a server.
+The server pushes updates to the cache until the lease expires.
+If the cache wants more pushed data, it needs to get a lease from the server again.
+The advantage of leases is they keep bookkeeping and push update membership manageable.
+
+**[top](#table-of-contents)**
+
+## Replica Placement
+
+The placement of replicas help improve reliability and performance.
+_Permanent replicas_ are maintained by the data store owner and help improve reliability by creating redundant copies.
+It can be a single server, but are often implemented as a cluster of mirrors.
+_Server-initiated replicas_ (edge caches) are maintained by external groups, but initiated by the data store owner.
+They help improve performance by being located closer to the client.
+Example of server-initiated replica hosts include CDNs (CloudFlare, Akamai).
+_Client-initiated replicas_ (browser and proxy caches) are not initiated by the data store owner.
+They help individual clients improve performance and accessibility.
+
+|              Replica Placement              |
+| :-----------------------------------------: |
+| ![placement](img/replication/placement.png) |
+
+_Dynamic placement_ involves creating and deleting replicas once a certain threshold is reached.
+An example of this is the RaDaR Web Hosting service.
+When a client requests data from a replica, a request tally is increase.
+Once the tally reaches the request threshold, a new replica is created and the tally resets.
+There are different thresholds for different actions (such as create or delete thresholds).
 
 **[top](#table-of-contents)**
