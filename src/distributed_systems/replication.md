@@ -1,10 +1,12 @@
 # Replication & Consistency <!-- omit in toc -->
 
-## Table of Contents <!-- omit in toc -->
+## Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Replication](#replication)
   - [Distributed Data Store](#distributed-data-store)
 - [Consistency](#consistency)
+  - [Consistency and Replication Trade-Offs](#consistency-and-replication-trade-offs)
 - [Data-Centric Consistency](#data-centric-consistency)
   - [Strict consistency](#strict-consistency)
   - [Linear consistency](#linear-consistency)
@@ -17,6 +19,16 @@
   - [Eventual Consistency](#eventual-consistency)
 - [CAP Theory](#cap-theory)
 - [Client-Centric Consistency](#client-centric-consistency)
+  - [Monotonic Reads](#monotonic-reads)
+  - [Monotonic Writes](#monotonic-writes)
+  - [Read Your Writes](#read-your-writes)
+  - [Write Your Reads](#write-your-reads)
+- [Consistency Protocols](#consistency-protocols)
+  - [Single-Server Protocol](#single-server-protocol)
+  - [Primary-Backup Protocol](#primary-backup-protocol)
+  - [Local-Write Protocols](#local-write-protocols)
+  - [Active Replication Protocol](#active-replication-protocol)
+  - [Quorum-Based Protocol](#quorum-based-protocol)
 
 ## Replication
 
@@ -46,6 +58,8 @@ _Control replication_ is horizontal scaling - replicating the services a machine
 **The biggest issue in replication is propagating updates.**
 Reads and writes must be synchronised between nodes.
 
+**[top](#table-of-contents)**
+
 ### Distributed Data Store
 
 Distributed data stores use data replication to achieve high reliability, performance and scalability.
@@ -62,6 +76,8 @@ Operations are not instantaneous:
 - _Time of issue_: when a client sends a request to the store.
 - _Time of execution_: when a request is executed by a replica.
 - _Time of completion_: when all replicas have been notified of the request and a reply is returned to the client.
+
+**[top](#table-of-contents)**
 
 ## Consistency
 
@@ -96,6 +112,20 @@ Fortunately, _consistency models_ can help with choosing a total order by defini
 Consistency models are either _data-centric_ or _client-centric_.
 It's up to the system designer to choose which consistency model to use.
 
+**[top](#table-of-contents)**
+
+### Consistency and Replication Trade-Offs
+
+All consistency models have trade-offs with the properties replication try to provide:
+
+- _Reliability_: maintaining reliability means having strong consistency: all replicas must have the full state at any given time.
+  Weaker consistency means reduced reliability.
+- _Performance_: having consistency means more network communication, which is a hinderance to performance.
+  The weaker the consistency model, the less communication is required, so performance and consistency have an inverse relationship.
+- _Scalability_: consistency model should avoid a central replica and minimise communication to be scalable.
+
+**[top](#table-of-contents)**
+
 ## Data-Centric Consistency
 
 ### Strict consistency
@@ -105,6 +135,8 @@ It's up to the system designer to choose which consistency model to use.
 Strict consistency requires an absolute time ordering.
 As a result, it requires a global clock and instantaneous communication, making it impossible to implement in a distributed system.
 
+**[top](#table-of-contents)**
+
 ### Linear consistency
 
 **Operations are ordered according to a global timestamp**.
@@ -112,6 +144,8 @@ As a result, it requires a global clock and instantaneous communication, making 
 Linear consistency uses a global timestamp to order events.
 All events are done in the same order, although instantaneous network communication is not required.
 Requires a global clock, making it impossible to implement practically.
+
+**[top](#table-of-contents)**
 
 ### Sequential consistency
 
@@ -125,6 +159,8 @@ This results in a performance limitation of the other (read or write).
 |            Sequential Consistency             |
 | :-------------------------------------------: |
 | ![sequential](img/replication/sequential.png) |
+
+**[top](#table-of-contents)**
 
 ### Causal consistency
 
@@ -146,12 +182,16 @@ Causal consistency provides stronger consistency than other models, while being 
 Furthermore, it can survive network partitioning
 As a result, it is one of the most common consistency models used in practice.
 
+**[top](#table-of-contents)**
+
 ### FIFO (PRAM) Consistency
 
 **Program order is maintained**.
 
 Only the writes on each client is consistent.
 This will create discrepancies between clients, as no total order is enforced.
+
+**[top](#table-of-contents)**
 
 ### Weak Consistency
 
@@ -160,6 +200,8 @@ This will create discrepancies between clients, as no total order is enforced.
 When a _synchronise()_ operation occurs, groups of write operations are propagated to all other nodes as updates.
 Updates are organised in sequential order between the nodes.
 Once all the updates have been accounted for, read/write operations can continue.
+
+**[top](#table-of-contents)**
 
 ### Release Consistency
 
@@ -174,22 +216,28 @@ A solution to this is using _lazy release_ consistency.
 Here, acquire will ask each node for its latest update.
 This reduces network traffic and does not fill up message queues unnecessarily.
 
+**[top](#table-of-contents)**
+
 ### Entry Consistency
 
-**Synchronisation attached to shared objects**
+**Synchronisation attached to shared objects**.
 
 Can use _acquire()_ and _release()_ (as RMI calls) to access object.
 Object itself is not sent over the network, only synchronisation primitives.
 If the node who owns the object crashes, or if there is a network partition, the object cannot be accessed.
 
+**[top](#table-of-contents)**
+
 ### Eventual Consistency
 
-**Given no updates, all replicas will eventually have the same data**
+**Given no updates, all replicas will eventually have the same data**.
 
 For this to work, a small amount of read-write conflicts and even less write-write conflicts are tolerated.
 Works well in a single writer, multiple readers scenario.
 Client has to accept some level of time inconsistency.
 An example of where this is implemented is with _DNS_ - changes to a record will take time to update, but it will reach eventual consistency.
+
+**[top](#table-of-contents)**
 
 ## CAP Theory
 
@@ -205,11 +253,125 @@ You can only have two of the three properties:
 - _CP_: Access to one replica is lost, but consistency is maintained as there is only one replica to write to.
 - _CA_: Access to both replicas are maintained, but data becomes read-only (i.e. not writes allowed) to maintain consistency.
 
-|                  AP                  |                 CP                 |                 CA                 |
-| :----------------------------------: | :--------------------------------: | :--------------------------------: |
-| ![mirroring](img/replication/ap.png) | ![caching](img/replication/cp.png) | ![caching](img/replication/ca.png) |
+|              AP               |              CP               |              CA               |
+| :---------------------------: | :---------------------------: | :---------------------------: |
+| ![ap](img/replication/ap.png) | ![cp](img/replication/cp.png) | ![ca](img/replication/ca.png) |
 
 In general, we want partition tolerance, so it becomes a choice between consistency and accessibility.
 If we assume network partitions are short, then we can have accessibility, partition tolerance and eventual consistency without breaking the CAP theory.
 
+**[top](#table-of-contents)**
+
 ## Client-Centric Consistency
+
+Client-centric consistency provides session guarantees for a client.
+We assume a single client is moving, so it will be in contact with a different replica at any given time.
+Furthermore, it is assumed that the client will have more reads than writes, and **zero concurrent writes**.
+Because of this, we can use eventual consistency as the basis for all client-centric models.
+Client-centric models can only be used in the special case where there are no simultaneous updates to the data store.
+
+**[top](#table-of-contents)**
+
+### Monotonic Reads
+
+**Client never sees an older version of the data**.
+
+If a client reads data at time _t_, the client should never see data written before _t_.
+Replica needs to collect the write set up to the last client read (i.e. at time _t_) before the next client read.
+This allows for stale data to be read if the write set has not propagated to all replicas.
+This is good for when the client is purely reading.
+For example, reading an email from different replicas
+
+**[top](#table-of-contents)**
+
+### Monotonic Writes
+
+**Write sets are propagated before the next write**.
+
+Most recent write set for each replica must be collected before the next write.
+Similar to FIFO consistency, but for a single client.
+This is good for when the client is purely writing.
+For example, writing to a file using different replicas.
+
+**[top](#table-of-contents)**
+
+### Read Your Writes
+
+**The most recent write will be seen by the next read**.
+
+Replicas are guaranteed to have the write set of all nodes before the next client read.
+For example, sending an email and reading from it.
+
+**[top](#table-of-contents)**
+
+### Write Your Reads
+
+**The next write will use the last value read by the client**.
+
+Replicas are guaranteed to have the write set of all nodes before the next client write.
+
+**[top](#table-of-contents)**
+
+## Consistency Protocols
+
+_Consistency protocols_ are an implementation of one or more consistency models.
+They come as either:
+
+- _Primary-based protocols_: contain a centralised copy where all writes are performed.
+  Obviously, this does not scale well, but it is easier to implement.
+  The main advantage of using primary-based protocols is that they **provide sequential consistency**.
+- _Replicated-write protocols_: writes can happen on any replica.
+  This scales well but is more complex to implement and can hinder performance (due to network communication).
+  Replicated-write protocols do not provide
+
+**[top](#table-of-contents)**
+
+### Single-Server Protocol
+
+All writes and reads are executed at a single server (via RPC calls).
+Effectively, this makes the replicas caches as opposed to mirrors.
+The protocol is easy to implement, but does not provide reliability because there are no replicas.
+
+**[top](#table-of-contents)**
+
+### Primary-Backup Protocol
+
+All writes are executed at a single server; reads can occur from any server (via RPC calls).
+A write update blocks until it has been propagated to all replicas.
+Does not scale well, but is easy to implement and provides reliability.
+
+**[top](#table-of-contents)**
+
+### Local-Write Protocols
+
+_Migration protocol_: when a read or write is requested, the primary copy of the data is sent to the replica in contact with the client.
+This is good for small data items with no sharing, but the data is not replicated, hence there is no reliability.
+If there was sharing and many reads/writes happening on two different replicas, thrashing would occur.
+
+_Migration-primary protocol_: when a write is requested, the primary copy of the data is sent to the replica in contact with the client.
+This is good for concurrent reads, but is bad for concurrent writes, as the thrashing problem persists.
+This can also provide an "offline" copy that the client can write to, and updates will propagate back once the client returns online.
+The protocol also provides reliability, as the data is replicated to other servers for read requests.
+
+|             Migration Protocol              |                 Migration Primary Protocol                  |
+| :-----------------------------------------: | :---------------------------------------------------------: |
+| ![migration](img/replication/migration.png) | ![migration_primary](img/replication/migration_primary.png) |
+
+**[top](#table-of-contents)**
+
+### Active Replication Protocol
+
+Active replication: writes propagate to replicas, reads performed locally
+Requires multicast messaging in total order
+Sequencer required to sequence messages in total order - not scalable
+
+**[top](#table-of-contents)**
+
+### Quorum-Based Protocol
+
+Quorum-based protocols: replicas voting on what to write or read next
+Every round of voting is a version
+At least one replica must want to read and write to the data so the read quorum and write quorum overlap - Nr + Nw > N
+Want at least half of the replicas in the write quorum to guarantee the client contacts a replica with the latest version number - Nw > N/2
+
+**[top](#table-of-contents)**
