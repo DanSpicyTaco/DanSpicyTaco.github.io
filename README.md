@@ -31,6 +31,7 @@
 - [Communication](/src/distributed_systems/communication.md)
 - [Replication & Consistency](/src/distributed_systems/replication.md)
 - [Synchronisation & Communication](/src/distributed_systems/synchronisation.md)
+- [Distributed File Systems](/src/distributed_systems/dfs.md)
 
 ## Cloud Computing
 
