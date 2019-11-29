@@ -2,14 +2,47 @@
 
 ## Introduction
 
-- Idea is that you have a bunch of files that can be accessed by multiple computers
-- Can communicate and coordinate with a DFS paradigm
-- Shared data is persistent --> communication is persistent
-- General model --> clients and servers
-- Challenges - transparency, flexibility, dependability (consistency), performance and scalability
-  - When things break, it's not pretty - things can lock and you need a locking service
+_DFS_ is a paradigm in distributed systems that outlines how to share files with multiple computers.
+The central idea is that files can be accessed by many clients through a file server.
+The files on a file server is persistent, so it is possible to have long lasting asynchronous communication between clients.
+This is different to DSM or the shared object paradigm, who do not have persistent file storage.
+For example, in DSM, files only exist for as long as the master lives.
+
+The basic model in DFS is client-server.
+Clients access files and directories, while servers store and provide the files to clients.
+Different clients may be served different views of the same file, meaning client state is important in this paradigm.
+
+Challenges and desired properties when implementing DFS includes:
+
+- _Transparency_: different levels of transparency are desired.
+  Clients should not be aware of a file's _location_, number of _replicas_ and when it _migrates_.
+  Clients should be aware when a file is being accessed _concurrently_ by multiple clients.
+- _Flexibility_: servers can be added, removed and replaced with ease.
+Furthermore, servers should be able to serve from any underlying OS, such as Windows, OSX or Linux.
+- _Reliability_: file servers must deal with _consistency_ issues (replication and concurrent access), _security_ (file access rights) and _fault tolerance_ (crashing servers and availability of files).
+- _Performance_: might need to distribute client requests to prevent overloading a single file server.
+  Multiple file servers may be required to store a large file system.
+- _Scalability_: need to avoid centralised components, including naming service, locking service and file stores.
+  Should also deal with geographical and administrative scalability.
+  For example, servers should be separated geographically.
 
 ### Client's Perspective: File Services
+
+The standard interface for DFS supports a file as an **uninterpreted sequence of bytes**.
+Furthermore, the interface stores file metadata - access times, ownership, creation data and permissions.
+Clients have four main operations available to them:
+
+- Read (from a file)
+- Write (to a file)
+- Add (a file)
+- Remove (a file)
+
+From the client's perspective, there are two main models a DFS can follow:
+
+- _Upload/download model_: a client downloads the file, makes changes and uploads the file back to the server.
+Network traffic is reduced in this model, as the client does not have to send read and write operations to the server.
+Furthermore, the client can have remote access to the file when it goes offline.
+However, concurrency 
 
 - Ideally, client sees remote and local files as the same
 - Standard interface is a file - uninterpreted sequence of bytes
