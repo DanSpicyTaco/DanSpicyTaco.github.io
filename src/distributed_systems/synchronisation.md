@@ -1,4 +1,14 @@
-# Synchronisation and Communication
+# Synchronisation and Communication <!-- omit in toc -->
+
+- [Distributed Algorithms](#distributed-algorithms)
+  - [Synchronous Distributed Algorithms](#synchronous-distributed-algorithms)
+  - [Asynchronous Distributed Algorithms](#asynchronous-distributed-algorithms)
+  - [Synchronisation and Coordination](#synchronisation-and-coordination)
+- [Time and Clocks](#time-and-clocks)
+  - [Physical Clocks](#physical-clocks)
+  - [Logical Clocks](#logical-clocks)
+- [Global State](#global-state)
+- [Concurrency Control](#concurrency-control)
 
 ## Distributed Algorithms
 

@@ -1,4 +1,15 @@
-# Fault Tolerance
+# Fault Tolerance <!-- omit in toc -->
+
+- [Failure](#failure)
+  - [Case Study: AWS Failure 2011](#case-study-aws-failure-2011)
+  - [Failures and Faults](#failures-and-faults)
+  - [Failure Models](#failure-models)
+  - [Detecting Failure](#detecting-failure)
+  - [Fault Tolerance](#fault-tolerance)
+- [Reliable Communication](#reliable-communication)
+  - [Reliable Multicast](#reliable-multicast)
+- [Process resilience](#process-resilience)
+- [Recovery](#recovery)
 
 ## Failure
 
