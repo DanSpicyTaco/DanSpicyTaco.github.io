@@ -63,8 +63,8 @@ Synchronisation and coordination can be based on either _physical clocks_ (based
 ### Physical Clocks
 
 _Physical clocks_: use UTC time to synchronise and coordinate operations.
-$C_p(t)$ is the current UTC time on machine $p$.
-Machine $p$ must synchronise with UTC often as drift will occur.
+$$C_p(t)$$ is the current UTC time on machine $$p$$.
+Machine $$p$$ must synchronise with UTC often as drift will occur.
 Synchronisation between computers can occur _internally_ (between computers) or _externally_ (with a time server).
 
 _Berkley algorithm_: each computer has a time daemon which they poll for a time.
@@ -106,30 +106,30 @@ There are many ways to synchronise time in NTP:
 ### Logical Clocks
 
 _Logical clocks_: determining event ordering, as opposed to events at relative to some time.
-Use the _happened before_ operator: $a → b$ (a happened before b).
-$a → b$ means that:
+Use the _happened before_ operator: $$a → b$$ (a happened before b).
+$$a → b$$ means that:
 
-- ‘a’ occurred before ‘b’ on the same machine (maintaining program order).
-- ‘a’ was a message sent and ‘b’ was the message received on another process.
-- ‘a’ and ‘b’ are on separate processes but are transitively related by the other two reasons.
+- $$a$$ occurred before $$b$$ on the same machine (maintaining program order).
+- $$a$$ was a message sent and $$b$$ was the message received on another process.
+- $$a$$ and $$b$$ are on separate processes but are transitively related by the other two reasons.
 
-Events that do not have a $→$ relation are _concurrent_: $a || b$ (a is concurrent to b).
+Events that do not have a $$→$$ relation are _concurrent_: $$a \| b$$ (a is concurrent to b).
 
 _Lamport clocks_: clocks that determine the causal ordering of events.
-Used compute the $→$ relation.
-A clock on machine $i$ is referred to as $L_i$
+Used compute the $$→$$ relation.
+A clock on machine $$i$$ is referred to as $$L_i$$.
 
 **Implementation**:
 
-1. Before executing a local event, timestamp it with $L_i := L_i + 1$.
-2. When a message $m$ is sent from machine $i$ to $j$:
-   - $i$ updates it's timestamp and sends $L_i$ along with $m$.
-   - $j$ receives $L_i$ with $m$ and updates it's timestamp to $L_j := max(L_j, L_i) + 1$.
+1. Before executing a local event, timestamp it with $$L_i := L_i + 1$$.
+2. When a message $$m$$ is sent from machine $$i$$ to $$j$$:
+   - $$i$$ updates it's timestamp and sends $$L_i$$ along with $$m$$.
+   - $$j$$ receives $$L_i$$ with $$m$$ and updates it's timestamp to $$L_j := max(L_j, L_i) + 1$$.
 
-The timestamp of event $a$ on machine $i$ is $L_i(a)$.
-If $L_i(a) < L_i(b)$, we know with certainty that:
+The timestamp of event $$a$$ on machine $$i$$is $$L_i(a)$$.
+If $$L_i(a) < L_i(b)$$, we know with certainty that:
 
-- either $a → b$ or $a || b$
+- either $$a → b$$ or $$a \| b $$
 - b did not happen before a
 
 The drawback of using Lamport clocks is that it does not provide a single, causally related total ordering.
@@ -138,52 +138,52 @@ The drawback of using Lamport clocks is that it does not provide a single, causa
 | :-----------------------------------------------------: |
 | ![lamport_clock](img/synchronisation/lamport_clock.png) |
 
-In this example, the total order is: $(11 ||/→ 21) → (12 ||/→ 22) → (13 ||/→ 23) → 14 → 15 → (16 ||/→ 24) → (17 ||/→ 27)$.
+In this example, the total order is: $$(11 \|/→ 21) → (12 \|/→ 22) → (13 \|/→ 23) → 14 → 15 → (16 \|/→ 24) → (17 \|/→ 27)$$.
 Some operations can be concurrent or happened before, but we are not sure.
 
 _Vector clocks_: solves the concurrency problem in Lamport clocks by maintaining a clock for each computer.
-A clock $V_i$ is an array on machine $i$ that has a length of $N$ machines.
-$V_i[j]$ is machine $j$ clock stored on machine $i$.
-I.e. the time of the last received message on machine $j$.
+A clock $$V_i$$ is an array on machine $$i$$ that has a length of $$N$$ machines.
+$$V_i[j]$$ is machine $$j$$ clock stored on machine $$i$$.
+I.e. the time of the last received message on machine $$j$$.
 
 **Implementation**:
 
-1. Initially, $V_i[j] := 0$ for $i,j∈{1,...,N}$.
-2. Before executing a local event, timestamp it with $V_i[i] := V_i[i] + 1$.
-3. When a message $m$ is sent from machine $i$ to $j$:
-   - $i$ updates it's timestamp and sends $V_i$ along with $m$.
-   - $j$ receives $V_i$ with $m$ and merges the vector clocks to:
+1. Initially, $$V_i[j] := 0$$ for $$i,j∈{1,...,N}$$.
+2. Before executing a local event, timestamp it with $$V_i[i] := V_i[i] + 1$$.
+3. When a message $$m$$ is sent from machine $$i$$ to $$j$$:
 
-$$
-    V_j[k] :=
-        \left\{
-        \begin{array}{ll}
-            max(V_j[k], V_i[k]) + 1 \qquad \ if \ j=k \\
-            max(V_j[k], V_i[k]) \qquad \qquad otherwise
-        \end{array}
-    \right.
-$$
+   - $$i$$ updates it's timestamp and sends $$V_i$$ along with $$m$$.
+   - $$j$$ receives $$V_i$$ with $$m$$ and merges the vector clocks to:
 
-We know with certainty that for events $a$ and $b$, which have a vector clock stamp of $V(a)$ and $V(b)$:
+   $$
+      V_j[k] := \left\{
+      \begin{array}{ll}
+          max(V_j[k], V_i[k]) + 1 \qquad \ if \ j=k \\
+          max(V_j[k], V_i[k]) \qquad \qquad otherwise
+      \end{array}
+       \right.
+   $$
 
-- $a → b$ iff:
+We know with certainty that for events $$a$$ and $$b$$, which have a vector clock stamp of $$V(a)$$ and $$V(b)$$:
 
-  - $V(a)[k] \leq V(b)[k]$ for all $k∈{1,...,N}$.
-    I.e. all elements of $V(a)$ are less than/equal all elements in $V(b)$.
-  - $V(a)[k] < V(b)[k]$ for at least one $k∈{1,...,N}$.
-    I.e. at least one element in $V(a)$ at position $k$ is less than the element in the same position in $V(b)$.
+- $$a → b$$ iff:
 
-- $a || b$ iff $V(a)[k] \ngeq V(b)[k] \land V(a)[k] \ngeq V(b)[k]$ for all $k∈{1,...,N}$.
-  I.e. if at least one element in $V(a)$ is less than an element in $V(b)$ and vice versa, a is concurrent to b.
+  - $$V(a)[k] \leq V(b)[k]$$ for all $$k∈{1,...,N}$$.
+    I.e. all elements of $$V(a)$$ are less than/equal all elements in $$V(b)$$.
+  - $$V(a)[k] < V(b)[k]$$ for at least one $$k∈{1,...,N}$$.
+    I.e. at least one element in $$V(a)$$ at position $$k$$ is less than the element in the same position in $$V(b)$$.
+
+- $$a \| b$$ iff $$V(a)[k] \ngeq V(b)[k] \land V(a)[k] \ngeq V(b)[k]$$ for all $$k∈{1,...,N}$$.
+  I.e. if at least one element in $$V(a)$$ is less than an element in $$V(b)$$ and vice versa, a is concurrent to b.
 
 |                 Vector Clock Example                  |
 | :---------------------------------------------------: |
 | ![vector_clock](img/synchronisation/vector_clock.png) |
 
-In this example, $E_{31}$ happened before $E_{24}$ as all elements in $E_{31}$ are less than/equal to the elements in $E_{24}$ and $E_{31}[0] < E_{24}[0]$.
-$V(E_{11})$ and $V(E_{12})$ occurred concurrently as $V(E_{11})[0] > V(E_{12})[0]$ and $E_12[1] > E11[1]$.
+In this example, $$E_{31}$$ happened before $$E_{24}$$ as all elements in $$E_{31}$$ are less than/equal to the elements in $$E_{24}$$ and $$E_{31}[0] < E_{24}[0]$$.
+$$V(E_{11})$$ and $$V(E_{12})$$ occurred concurrently as $$V(E_{11})[0] > V(E_{12})[0]$$ and $$E_12[1] > E11[1]$$.
 
-The total order is: $(11||21||31) → (12||32) → (22 → 23 → 24 → 13) || 32$.
+The total order is: $$(11\|21\|31) → (12\|32) → (22 → 23 → 24 → 13) \| 32$$.
 We are able to tell what which operations are concurrent with certainty.
 
 ## Global State
