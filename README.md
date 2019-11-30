@@ -11,10 +11,6 @@
 
 - [notes](/src/erlang.md): notes and cheatsheet
 
-### Markdown
-
-- [Markdown](/src/markdown.md): Markdown cheatsheet ([Source](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet))
-
 ### Python
 
 - [pyenv](/src/pyenv.md): Installing new python versions and managing virtualenvs
@@ -25,13 +21,14 @@
 
 ## Distributed Systems
 
-- [Distributed Systems](/src/distributed_systems/distributed_systems.md)
-- [System Architecture](/src/distributed_systems/architecture.md)
-- [Distributed Shared Memory](/src/distributed_systems/dsm.md)
-- [Communication](/src/distributed_systems/communication.md)
-- [Replication & Consistency](/src/distributed_systems/replication.md)
-- [Synchronisation & Communication](/src/distributed_systems/synchronisation.md)
-- [Distributed File Systems](/src/distributed_systems/dfs.md)
+- [Distributed Systems](/src/distributed_systems/distributed_systems.md): An introduction to distributed systems (DS)
+- [System Architecture](/src/distributed_systems/architecture.md): Different architectures used in DS
+- [Distributed Shared Memory](/src/distributed_systems/dsm.md): A DS paradigm
+- [Communication](/src/distributed_systems/communication.md): How nodes communicate within a DS
+- [Replication & Consistency](/src/distributed_systems/replication.md): Creating redundancy in a DS with replication
+- [Synchronisation & Communication](/src/distributed_systems/synchronisation.md): Making sure operations are completed in the right order, at the right time.
+- [Fault Tolerance](/src/distributed_systems/fault_tolerance.md): Preventing node faults from crashing the entire system
+- [Distributed File Systems](/src/distributed_systems/dfs.md): A DS paradigm
 
 ## Cloud Computing
 
