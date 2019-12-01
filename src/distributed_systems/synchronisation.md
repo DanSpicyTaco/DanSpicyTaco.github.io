@@ -73,7 +73,7 @@ Synchronisation and coordination can be based on either _physical clocks_ (based
 ### Physical Clocks
 
 _Physical clocks_: use UTC time to synchronise and coordinate operations.
-$$C_p(t)$$ is the current UTC time on machine $$p$$.
+_$$C_p(t)$$_ is the current UTC time on machine $$p$$.
 Machine $$p$$ must synchronise with UTC often as drift will occur.
 Synchronisation between computers can occur _internally_ (between computers) or _externally_ (with a time server).
 
@@ -117,7 +117,7 @@ There are many ways to synchronise time in NTP:
 
 _Logical clocks_: determining event ordering, as opposed to events at relative to some time.
 Use the _happened before_ operator: $$a → b$$ (a happened before b).
-$$a → b$$ means that:
+_$$a → b$$_ means that:
 
 - $$a$$ occurred before $$b$$ on the same machine (maintaining program order).
 - $$a$$ was a message sent and $$b$$ was the message received on another process.
@@ -153,7 +153,7 @@ Some operations can be concurrent or happened before, but we are not sure.
 
 _Vector clocks_: solves the concurrency problem in Lamport clocks by maintaining a clock for each computer.
 A clock $$V_i$$ is an array on machine $$i$$ that has a length of $$N$$ machines.
-$$V_i[j]$$ is machine $$j$$ clock stored on machine $$i$$.
+_$$V_i[j]$$_ is machine $$j$$ clock stored on machine $$i$$.
 I.e. the time of the last received message on machine $$j$$.
 
 **Implementation**:
@@ -176,11 +176,11 @@ I.e. the time of the last received message on machine $$j$$.
 
 We know with certainty that for events $$a$$ and $$b$$, which have a vector clock stamp of $$V(a)$$ and $$V(b)$$:
 
-- $$a → b$$ iff:
+- _$$a → b$$_ iff:
 
-  - $$V(a)[k] \leq V(b)[k]$$ for all $$k∈{1,...,N}$$.
+  - _$$V(a)[k] \leq V(b)[k]$$_ for all $$k∈{1,...,N}$$.
     I.e. all elements of $$V(a)$$ are less than/equal all elements in $$V(b)$$.
-  - $$V(a)[k] < V(b)[k]$$ for at least one $$k∈{1,...,N}$$.
+  - _$$V(a)[k] < V(b)[k]$$_ for at least one $$k∈{1,...,N}$$.
     I.e. at least one element in $$V(a)$$ at position $$k$$ is less than the element in the same position in $$V(b)$$.
 
 - $$a \| b$$ iff $$V(a)[k] \ngeq V(b)[k] \land V(a)[k] \ngeq V(b)[k]$$ for all $$k∈{1,...,N}$$.
