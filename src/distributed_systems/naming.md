@@ -7,8 +7,11 @@
   - [Merging Name Spaces](#merging-name-spaces)
 - [Name Resolution](#name-resolution)
 - [Naming Services](#naming-services)
-- [Attribute Based Naming (aka Directory Services)](#attribute-based-naming-aka-directory-services)
-- [Distributed Hash Tables](#distributed-hash-tables)
+  - [Partitioning](#partitioning)
+  - [Replication](#replication)
+  - [Caching](#caching)
+  - [Example: DNS](#example-dns)
+- [Attribute Based Naming](#attribute-based-naming)
 
 ## Basic Concepts
 
@@ -114,11 +117,112 @@ _Merging_ name spaces can be done in two ways:
 
 ## Name Resolution
 
+_Name resolution_ is the process of looking up an entity the name is referred to.
+A _resolver_ acts on behalf of the client to resolve the name and return the entity or data associated with the name.
+It can be implemented in the client process, the OS, a name server or any other service.
+Name resolution is either _iterative_ or _recursive_.
+
+|       Iterative Name Resolution        |       Recursive Name Resolution        |
+| :------------------------------------: | :------------------------------------: |
+| ![iterative](img/naming/iterative.png) | ![recursive](img/naming/recursive.png) |
+
+The biggest problem with name resolution is figuring out where to begin.
+Knowing how and where to start resolution is called the _closure mechanism_.
+It always has to be implicit, otherwise, you would need a closure mechanism to find the closure mechanism.
+Examples of closure mechanisms are external references to the root node of a name space or a reference to the current directory (for relative paths).
+In practice, **the starting point for name resolution has to be fixed**.
+
 ## Naming Services
+
+_Naming service_: a service that provides access to a name space via name servers.
+Allows clients to perform operations on the name space: _add_, _remove_, _lookup_ (resolution) and _modify_ nodes.
+
+_Authoritative name server_: a name server that contains the original entity or its attributes.
+
+Want to avoid centralised naming services because of scalability reasons.
+For distributed naming services, you want to distribute both the management and naming resolution load on the name servers.
+This can be done by partitioning, replicating and caching the name space.
+
+### Partitioning
+
+_Partitioning_ the name space involves splitting it into different servers.
+This is often done by partitioning zones.
+Parts/zones of a name space:
+
+- _Global layer_: highest level of nodes.
+  They are stable (don't change much), making it easy to replicate (no consistency issues).
+- _Administrative layer_: part of the name space associated with one entity.
+  They are stable, but not as stable as the global layer.
+- _Managerial layer_: lowest layer of nodes, which contain all of the leaf nodes.
+  They are not stable, nodes can be added, removed or modified regularly.
+
+Top layer nodes see the most traffic, so they need to be distributed to keep performance at an acceptable level.
+Directory nodes represent the smallest unit of distribution a name space can have.
+It is possible to split each directory node onto a new name server.
+
+There are two types of partitioning possible:
+
+- _Structured partitioning_: split the name space according to the graph structure.
+  More suited to strictly hierarchical structure.
+  Lookups are fast, but the structure is rigid.
+- _Structure-free partitioning_: content is placed on servers independent of the graph structure.
+  More suited to DAG structure.
+  Flexible structure, but will increase the load on the root node as well as decrease lookup time.
+
+|              Partitioning              |
+| :------------------------------------: |
+| ![partition](img/naming/partition.png) |
+
+### Replication
+
+_Replication_ involves copying all or parts of the name space to different name servers.
+
+_Full replication_: copy the complete name space.
+This is simple and provides fast access.
+However, each server will need to store the entire name space, so size becomes an issue.
+Furthermore, you will have consistency issues as well as administration issues (such as not being able to replicate certain directory nodes or checking access rights).
+Making sure replicas are consistency will become the bottleneck of the system.
+
+_Partial replication_: replace the zones to different name servers.
+This combines partitioning and replication.
+This improves performance as there is less consistency overhead, as well as less administrative problems.
+
+|        Partial Replication         |
+| :--------------------------------: |
+| ![partial](img/naming/partial.png) |
+
+### Caching
+
+_Name caches_: cache query results from name resolution.
+Benefits include:
+
+- _Locality_: high degree of locality with name lookups, so the cache hit rate is generally high.
+- _Scalability_: as the query result is cached rather than the query, administrative problems are reduced, improving scalability.
+- _Maintenance_: slow update of database makes consistency maintenance low.
+- _Invalidation Updates_: on use consistency means stale data is detected on use, so updates don't need to be propagated.
+- _Leasing_: cached results usually have a lease on them, reducing consistency overhead.
+
+There are three types of name caches:
+
+- _Directory cache_: directory node data is cached.
+  Usually used for iterative name resolution.
+- _Prefix cache_: path name and zone information is cached.
+  Unsuitable for unstructured distribution.
+- _Full-name cache_: cache full path information.
+  Used for unstructured distribution, but tends to require large caches due to result size.
+
+A cache can be implemented in:
+
+- _Client process_: large miss rate on start up, but is fast.
+- _Kernel process_: low miss rate and can be shared between processes, but is slow.
+- _Shared client process_: low miss rate, can be shared between processes and is fast.
+  This is generally implemented as an OS daemon.
+
+### Example: DNS
+
+
+
+## Attribute Based Naming
 
 - Attribute-based naming example: pizza as an attribute
 - Can look up pizza and get results from there
-
-## Attribute Based Naming (aka Directory Services)
-
-## Distributed Hash Tables

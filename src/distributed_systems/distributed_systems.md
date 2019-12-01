@@ -23,3 +23,12 @@ _Disadvantages_:
 - _Complexity_: more complex system - greater chance of introducing errors
 - _Partial failure_: can’t tell if a computer has crashed - won’t screw up the entire system but makes every node unreliable
 - _Security_: more components to secure, therefore easier to compromise
+
+
+Goals:
+1. _Transparency_
+2. _Dependability_: availability, reliability and maintenance
+3. _Scalability_ 
+4. _Performance_
+5. _Flexibility_: easy to add or remove components?
+
