@@ -91,7 +91,8 @@ Consistency requires two things:
 ```
 ! REMEMBER !
 
-Data coherence is the order of operations for a single data item, while data consistency is the order of operations for the entire data store.
+Data coherence is the order of operations for a single data item.
+Data consistency is the order of operations for the entire data store.
 ```
 
 Time consistency can be ensured through _versioning_.
