@@ -1,6 +1,6 @@
 # System Architecture <!-- omit in toc -->
 
-## Table of Contents <!-- omit in toc -->
+# Table of Contents <!-- omit in toc -->
 
 - [Client-Server Architecture](#client-server-architecture)
   - [Erlang Example](#erlang-example)
@@ -17,7 +17,7 @@
 
 **System architecture: figuring out where to place machines and the servers on them.**
 
-## Client-Server Architecture
+# Client-Server Architecture
 
 _Client-server architecture_: clients send requests, servers reply with responses.
 
@@ -51,7 +51,7 @@ Both horizontal distribution and vertical distribution are examples of horizonta
 
 Combining vertical and horizontal distribution makes the client-server architecture practically scalable.
 
-### Erlang Example
+## Erlang Example
 
 ```erlang
 %% Client to contact the server
@@ -75,7 +75,7 @@ loop () ->
             ignore;
     end.
 
-% Initiate the server
+%% Initiate the server
 start_server() ->
     spawn(
         fun () ->
@@ -84,7 +84,7 @@ start_server() ->
     ).
 ```
 
-## Peer to Peer Architecture
+# Peer to Peer Architecture
 
 _Peer To Peer Architecture_: all processes are clients and servers - creates a decentralised system.
 
@@ -115,17 +115,17 @@ There are two ways to structure an overlay network:
   - Hard to route to a peer you've never heard of before
   - Peers are always added or removed - hard to remain consistent
   - Sacrifices _performance_ for _flexibility_
-  - _E.g._: Winny network or Gnutella
+  - _E.g._ Winny network or Gnutella
 - _Structured overlay_: an algorithm is used to determine a peer's neighbours
   - Structure reduces latency because routing is easier
   - Sacrifices _flexibility_ for _performance_
-  - _E.g._: a distributed hash table - each node is responsible for the data that hashes to it
+  - _E.g._ a distributed hash table - each node is responsible for the data that hashes to it
 
 |            Unstructured Overlay Network            |      Distributed Hash Table      |
 | :------------------------------------------------: | :------------------------------: |
 | ![unstructured](img/architecture/unstructured.png) | ![dht](img/architecture/dht.png) |
 
-### DHT Example: Chord DHT
+## DHT Example: Chord DHT
 
 _Distributed hash table_: a hash table as an overlay network.
 DHT is good for unstructured lookups (i.e. if the content have no structure, using a DHT is good).
@@ -191,12 +191,12 @@ If a peer leaves:
   - Provides O(logN) time
   - Only true if successors are correct
 
-## Hybrid Architectures
+# Hybrid Architectures
 
 _Hybrid Architecture_: a combination of client-server and P2P architecture.
 They try to bring the benefits of both architectures and minimise the drawbacks.
 
-### Superpeer Networks
+## Superpeer Networks
 
 _Superpeer Networks_: superpeers serve regular peers, but are also peers amongst themselves.
 _E.g._ the old Skype used superpeers.
@@ -210,7 +210,7 @@ _E.g._ the old Skype used superpeers.
 | :------------------------------------------: |
 | ![superpeer](img/architecture/superpeer.png) |
 
-### Collaborative Distributed Systems
+## Collaborative Distributed Systems
 
 _Collaborative Distributed Systems_: download chunks of file from file server and nodes, managed by a tracker.
 _E.g._ BitTorrent.
@@ -227,7 +227,7 @@ The dependability drawback is mitigated by implementing the tracker as a DHT.
 | :--------------------------------------------------: |
 | ![collaborative](img/architecture/collaborative.png) |
 
-### Edge-Server Systems
+## Edge-Server Systems
 
 _Edge-Server Systems_: replication service (CDN) at network edge.
 _E.g._ Akamai, CloudFront, CoralCDN
@@ -242,7 +242,7 @@ _E.g._ Akamai, CloudFront, CoralCDN
 | :------------------------------: |
 | ![cdn](img/architecture/cdn.png) |
 
-## Process Architecture
+# Process Architecture
 
 There are three main process architectures:
 
@@ -263,9 +263,9 @@ A process can be either:
   - No cleanup required - the process can replicate and move to a new machine
   - Increased average message size
 
-## Server Architecture
+# Server Architecture
 
-### Clustered Servers
+## Clustered Servers
 
 _Clustered servers_: client request goes through a _dispatcher_, which forwards the request to a server replica.
 This reduces the load on any one replica, but increases the load on the dispatcher.
@@ -274,9 +274,10 @@ This reduces the load on any one replica, but increases the load on the dispatch
 | :------------------------------------------: |
 | ![clustered](img/architecture/clustered.png) |
 
-### Request Switching
+## Request Switching
 
 _Request switching_: switch decides which replica to route the client request to.
+
 Usually a request is sent on a round robin to each replica.
 Instead of creating a single point of failure at the dispatcher (in clustered servers), switch is implemented by client application or DNS.
 This increases dependability, flexibility and scalability.
