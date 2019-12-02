@@ -21,15 +21,20 @@
 
 ## Distributed Systems
 
-- [Distributed Systems](/src/distributed_systems/distributed_systems.md): An introduction to distributed systems (DS)
-- [System Architecture](/src/distributed_systems/architecture.md): Different architectures used in DS
-- [Distributed Shared Memory](/src/distributed_systems/dsm.md): A DS paradigm
+- [Distributed Systems](/src/distributed_systems/distributed_systems.md): Goals of distributed systems and algorithms
+
+### Principles
+- [System Architecture](/src/distributed_systems/architecture.md): Architectures used in distributed systems
 - [Communication](/src/distributed_systems/communication.md): How nodes communicate within a DS
 - [Replication & Consistency](/src/distributed_systems/replication.md): Creating redundancy in a DS with replication
 - [Synchronisation & Communication](/src/distributed_systems/synchronisation.md): Making sure operations are completed in the right order, at the right time.
-- [Fault Tolerance](/src/distributed_systems/fault_tolerance.md): Preventing node faults from crashing the entire system
 - [Naming](/src/distributed_systems/naming.md): How entities are referred to globally.
-- [Distributed File Systems](/src/distributed_systems/dfs.md): A DS paradigm
+- [Fault Tolerance](/src/distributed_systems/fault_tolerance.md): Preventing node faults from crashing the entire system
+- [Security](/src/distributed_systems/security.md)
+
+### Paradigms
+- [Distributed Shared Memory](/src/distributed_systems/dsm.md): Implementing shared memory in a distributed system
+- [Distributed File Systems](/src/distributed_systems/dfs.md): Implementing persistent file storage in a distributed system
 
 ## Cloud Computing
 
