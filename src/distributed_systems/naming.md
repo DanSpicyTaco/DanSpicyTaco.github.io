@@ -1,19 +1,26 @@
 # Naming <!-- omit in toc -->
 
+# Table of Contents <!-- omit in toc -->
+
 - [Basic Concepts](#basic-concepts)
   - [Terminology](#terminology)
 - [Name Spaces](#name-spaces)
   - [Hierarchical Name Space](#hierarchical-name-space)
-  - [Merging Name Spaces](#merging-name-spaces)
-- [Name Resolution](#name-resolution)
+    - [Merging Name Spaces](#merging-name-spaces)
+  - [Name Resolution](#name-resolution)
 - [Naming Services](#naming-services)
   - [Partitioning](#partitioning)
   - [Replication](#replication)
   - [Caching](#caching)
   - [Example: DNS](#example-dns)
 - [Attribute Based Naming](#attribute-based-naming)
+  - [Directory Services](#directory-services)
+    - [Searching and Lookup](#searching-and-lookup)
+  - [Example: X.500 and LDAP](#example-x500-and-ldap)
+  - [Unstructured Names](#unstructured-names)
+    - [Example: ARP](#example-arp)
 
-## Basic Concepts
+# Basic Concepts
 
 _Naming_ is used to identify _entities_ in systems.
 An example of this is the Unix file system - it treats all entities as a file, names them accordingly and allows access through the file interface.
@@ -23,7 +30,7 @@ The difficult parts of naming include:
   Need to implement a global system to name entities.
 - _Lookups_: once an entity is named, how do you find it?
 
-### Terminology
+## Terminology
 
 - _Entity_: a resource, user or process in the system.
 - _Name_: a string of bits or characters that refer to an identity.
@@ -65,7 +72,7 @@ The difficult parts of naming include:
     An example of a structured name could be combining the local time and a unique machine identifier.
   - _Example_: an inode
 
-## Name Spaces
+# Name Spaces
 
 _Name space_: a group of names which follow the same naming scheme.
 All name spaces have a _leaf node_, which represents a named entity and may refer to either the entity itself or the address of it.
@@ -78,7 +85,7 @@ Name spaces can have different structures, including:
   This structure is commonly used because it is scalable.
 - _Tag-based_
 
-### Hierarchical Name Space
+## Hierarchical Name Space
 
 In a hierarchical name space, a leaf node has only incoming edges.
 Furthermore, there are two more types of nodes used:
@@ -132,7 +139,7 @@ It always has to be implicit, otherwise, you would need a closure mechanism to f
 Examples of closure mechanisms are external references to the root node of a name space or a reference to the current directory (for relative paths).
 In practice, **the starting point for name resolution has to be fixed**.
 
-## Naming Services
+# Naming Services
 
 _Naming service_: a service that provides access to a name space via name servers.
 Allows clients to perform operations on the name space: _add_, _remove_, _lookup_ (resolution) and _modify_ nodes.
@@ -143,7 +150,7 @@ Want to avoid centralised naming services because of scalability reasons.
 For distributed naming services, you want to distribute both the management and naming resolution load on the name servers.
 This can be done by partitioning, replicating and caching the name space.
 
-### Partitioning
+## Partitioning
 
 _Partitioning_ the name space involves splitting it into different servers.
 This is often done by partitioning zones.
@@ -173,7 +180,7 @@ There are two types of partitioning possible:
 | :------------------------------------: |
 | ![partition](img/naming/partition.png) |
 
-### Replication
+## Replication
 
 _Replication_ involves copying all or parts of the name space to different name servers.
 
@@ -191,7 +198,7 @@ This improves performance as there is less consistency overhead, as well as less
 | :--------------------------------: |
 | ![partial](img/naming/partial.png) |
 
-### Caching
+## Caching
 
 _Name caches_: cache query results from name resolution.
 Benefits include:
@@ -218,11 +225,134 @@ A cache can be implemented in:
 - _Shared client process_: low miss rate, can be shared between processes and is fast.
   This is generally implemented as an OS daemon.
 
-### Example: DNS
+## Example: DNS
 
+Structure:
 
+- _Hierarchical structure_ (tree)
+  - Top-level domains (TLD) (.com, .org, .net, .au, .nl, ...)
+- _Zone_: a (group of) directory node
+- _Resource records_: contents of a node
+- _Domain_: a subtree of the global tree
+- _Domain name_: an absolute path name
 
-## Attribute Based Naming
+|            DNS             |
+| :------------------------: |
+| ![dns](img/naming/dns.png) |
 
-- Attribute-based naming example: pizza as an attribute
-- Can look up pizza and get results from there
+_Partitioning_: each zone implemented by a name server
+
+_Replication_: each zone replicated on at least two servers
+
+- Updates performed on primary
+- Contents transferred to secondary using zone transfer
+- Higher levels have many more replicas
+  - _E.g._ there are 13 root servers: A-M.root-servers.net, but technically 386 replicas using anycast.
+
+_Caching_: servers cache results of queries
+
+- Original entries have _time-to-live (TTL)_, which acts as a lease
+- Cached data is non-authoritative, provided until TTL expires
+
+_Name Resolution_: query sent to local server
+
+- If cannot resolve locally then sent to root
+- Resolved recursively or iteratively, depending on the context
+
+# Attribute Based Naming
+
+_Attribute-based naming_: naming entities based on their attributes.
+
+_E.g._ Yellow pages vs. White pages: Yellow pages stores names to numbers, while White pages stores businesses to numbers.
+Type of business is an _attribute_ - I can lookup 'pizza' in the White pages and get results from there.
+Its much easier to do than trying to identify all pizza shops by name in the Yellow pages.
+
+Name space is either _flat_ or _hierarchical_.
+
+Entities (_directory entries_) can be uniquely identified by a set of attributes, called the _distinguished name_.
+
+_Schema_: all possible attribute types in the name space.
+
+_Directory Information Tree (DIT)_: structure of the name space.
+
+_Directory Information Base (DIB)_: stores the actual content of each directory (i.e. a collection of directory entries).
+
+|          DIT/DIB           |
+| :------------------------: |
+| ![dit](img/naming/dit.png) |
+
+## Directory Services
+
+Directory services include the usual operations - modify, lookup, add, remove.
+
+Also has a _search_ operation.
+It can use partial knowledge to find potential candidates.
+This allows for **browsing** matches.
+
+_Partitioning_: partition according to name space structure.
+
+_Replication_: no restriction to replication.
+Possibilities include:
+
+- Replicating the whole directory or partitions
+- Creating read-write replicas or read-only replicas
+- Pushing updates to caches or catalogs
+
+|                 Partitioning                 |                Replication                 |
+| :------------------------------------------: | :----------------------------------------: |
+| ![partitioning](img/naming/partitioning.png) | ![replication](img/naming/replication.png) |
+
+### Searching and Lookup
+
+Approaches:
+
+- _Chaining_ (recursive)
+- _Referral_ (iterative)
+- _Multicasting_ (uncommon)
+
+Performance:
+
+- _Brute force_: search the whole name space
+  - Bad scalability
+  - Reduce searches by specifying context
+- _Catalog_: store copy of subset of DIB information in each server.
+  This reduces the number of servers that have to be contacted.
+
+The main problem in searching is **decomposition**.
+This because multiple attributes means there are multiple possible decompositions for partitioning, but only one can be implemented.
+
+| Searching in a Distributed Directory |
+| :----------------------------------: |
+|   ![search](img/naming/search.png)   |
+
+## Example: X.500 and LDAP
+
+_X.500_: an ISO standard protocol that implements a global DIT.
+
+Defines:
+
+- DIB
+- DIB partitioning
+- DIB replication
+
+_LDAP (Lightweight Directory Access Protocol)_: X.500 access over TCP/IP.
+
+Features:
+
+- Textual X.500 name representation
+- Popular on Internet
+- Used in Windows for Active Directory
+
+## Unstructured Names
+
+_Unstructured names_: names that do not have any attributes in them.
+
+Simple solution to finding unstructured names is to _broadcast_ a message to all availible nodes.
+
+### Example: ARP
+
+_ARP_: protocol that resolves MAC addresses by broadcasting.
+
+_E.g._ Resolver broadcasts: _"Who has 129.94.242.201? Tell 129.94.242.200"_
+
+129.94.242.201 answers to 129.94.242.200: _"129.94.242.201 is at 00:15:C5:FB:AD:95"_
