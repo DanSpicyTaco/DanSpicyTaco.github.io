@@ -69,6 +69,8 @@ Every distributed algorithm should have:
   - _Scalability_: avoid centralisation (central servers, algorithms, etc.)
   - _Reliability_: want minimal amount of points of failure
 
+![numbers](img/numbers.png)
+
 ## Synchronous Distributed Algorithms
 
 _Synchronous distributed algorithms_ have a **bounded time variance** - minimum and maximum time for clock drift, communication delay and execution speed.
