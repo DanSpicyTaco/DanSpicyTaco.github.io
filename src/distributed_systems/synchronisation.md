@@ -24,8 +24,19 @@
   - [Token Ring](#token-ring)
   - [Multicast and Logical Clocks](#multicast-and-logical-clocks)
 - [Transactions](#transactions)
+  - [Classification of Transactions](#classification-of-transactions)
+    - [Nested Transactions](#nested-transactions)
+  - [Transaction Atomicity Implementation](#transaction-atomicity-implementation)
+    - [Private Workspace](#private-workspace)
+    - [Writeahead Log](#writeahead-log)
+  - [Concurrency Control (Isolation)](#concurrency-control-isolation)
+    - [Serialisability](#serialisability)
+    - [Serial Equivalence](#serial-equivalence)
+  - [Managing concurrency (INCOMPLETE)](#managing-concurrency-incomplete)
 - [Elections](#elections)
-- [Multicast](#multicast)
+  - [Bully Algorithm](#bully-algorithm)
+  - [Ring Algorithm](#ring-algorithm)
+- [Multicast (INCOMPLETE)](#multicast-incomplete)
 
 # Synchronisation and Coordination
 
@@ -424,74 +435,118 @@ Node 2 goes to the _held_ state, Node 0 and Node 1 is _released_.
 
 # Transactions
 
-_Transactions_: mutual exclusion++ :)
-
-- A sequence/group of operations
-- Atomic in the face of concurrency and failures - either all or nothing
-- Allows multiple data items to be modified
+_Transactions_: group of operations that are viewed as atomic externally.
 
 Operations:
 
-- Begin/end transaction
-- Inbetween the begin/end, you can do reads/writes
-- End transaction - decide to commit or abort
+- `BeginTransaction`, `EndTransaction`
+- `Read`, `Write` (only between `BeginTransaction` and `EndTransaction`)
+- `Commit`, `Abort` (after `EndTransaction`)
 
-Inventory example:
+_E.g._: taking inventory on tapes.
+You can view the inventory history up to yesterday, and view the inventory from today separately.
+When you input both tapes to the computer, it doesn't effect the original copies.
+If the computer fails or the tape breaks, it's possible to abort back to the old inventory
+IF the computer succeeds, a new tape is made.
 
-- Can view old and today's tape, unmodified at any time
-- Output tape can fail or break, and you can abort back to old inventory
-- Can't see inside computer
-- If computer succeeds, new tape is made
-
-ACID properties - properties we are interested in for transactions
+_ACID properties_ - desired properties in for transactions
 
 - _Atomicity_ - all or nothing
-- _Consistent_ - doesn't produce inconsistent results
-  - E.g. a transaction can't create/destroy money (for bank transaction example)
+- _Consistent_ - doesn't produce inconsistent results.
+  _E.g._ a transaction can't create/destroy money (for bank transaction example)
 - _Isolated_ - operations aren't visible from the outside
 - _Durable_ - results are permanent after a commit, even in failure
 
+## Classification of Transactions
+
 Types of transactions:
 
-- Flat
-- Hierarchy
-- Distributed
+- _Flat_: sequence of transactions that satisfy ACID properties
+- _Hierarchy_: nested transactions
+- _Distributed_: flat transactions done in a distributed system
 
-Nested transaction failure options:
+### Nested Transactions
 
-- Abort whole transaction
-- Commit non-aborted transactions only
-- Try alternatives to aborted part
+If one transaction fails, but earlier transactions are successful, there are some options to take:
 
-Subtransaction can abort at any time, but can only commit when parent is ready to commit
+- _Abort_ the whole transaction
+- _Commit_ the non-aborted transactions only - don't handle the aborted transactions
+- Try _alternatives_ to the aborted transactions
 
-Transaction Atomicity Implementation:
+_Substransactions_: the transaction inside a larger transaction.
 
-Private workspace - create a copy of the data and run the transaction on it, on commit: swap the copies of data, on abort: discard the copy
+|                      Subtransactions                      |
+| :-------------------------------------------------------: |
+| ![subtransaction](img/synchronisation/subtransaction.png) |
 
-- Optimises for aborting
-- Uses a lot of space
+A parent transaction can commit even if some subtransactions have aborted.
 
-Writeahead log - run operations on original copy, on commit: do nothing, on abort: rollback
+If a parent aborts, all subtransactions must abort too.
 
-- Optimises for commit
+## Transaction Atomicity Implementation
 
-Concurrency control - what happens when you have simultaneous transactions?
+### Private Workspace
 
-Problem 1: lost update - writing to system gives inconsistent results
-Problem 2: inconsistent retrieval - accessing state of the system in the middle of a transaction gives inconsistent results
+_Private workspace_: create a copy of the data and run the transaction on it.
 
-Legal schedule - want concurrent transactions to look like they are serialised
+- On _commit_: swap the copies of data.
+- On _abort_: discard the copy.
 
-Serial equivalence: want all conflicting operations (read-write/write-write) to be in the same order on data items
-E.g. R1(x) W1(x) R2(y) W2(y) R2(x) W1(y) is not serially equivalent
-Conflicting operations: {W1(x), R2(x)}, {R2(y), W1(y)}, {W2(y), W1(y)}
-All 1's need to be before 2's, or vice versa
+_Benefit_: optimised for aborting.
 
-    R1(x)R2(y)W2(y)R2(x)W1(x)W1(y) is serially equivalent
-    All 2's are before 1's
+_Drawback_: takes up a lot of memory.
 
-Managing concurrency
+### Writeahead Log
+
+_Writeahead log_: run operations on original copy.
+
+- On _commit_: do nothing.
+- On _abort_: rollback to old data.
+
+_Benefit_: optimised for commit.
+
+_Drawback_: uses additional computing power.
+
+## Concurrency Control (Isolation)
+
+Simultaneous transactions creates some problems:
+
+- _Lost update_: operations in one transaction overwrites the operations in another.
+- _Inconsistent retrieval_: accessing the data in the middle of a transaction provides inconsistent results
+
+_Concurrency control algorithms_: guarantee multiple transactions can be executed simultaneously while still being isolated.
+
+### Serialisability
+
+Types of conflict that can occur in simultaneous transactions:
+
+- _Write-read_: one of the operations is a write
+- _Write-write_: both of the operations are writes
+
+_Serialised_: making it seem as though concurrent transactions are executed one after another.
+
+_Legal schedule_: want concurrent transactions to look like they are serialised.
+
+|             Legal Schedules             |
+| :-------------------------------------: |
+| ![legal](img/synchronisation/legal.png) |
+
+In this example, only the last schedule is illegal, as `x=x+2` occurs before `x=x+3`, when it should be `x=0`.
+
+### Serial Equivalence
+
+_Serial equivalence_: want all conflicting operations to be in the same order on data items.
+
+_Examples_:
+
+- `R1(x) W1(x) R2(y) W2(y) R2(x) W1(y)`: not serially equivalent
+  - Conflicting operations: {`W1(x)`, `R2(x)`}, {`R2(y)`, `W1(y)`}, {`W2(y)`, `W1(y)`}
+  - Not all conflicting operations occur in the same order
+- `R1(x) R2(y) W2(y) R2(x) W1(x) W1(y)`: serially equivalent
+  - Conflicting operations: {`R2(y)`, `W1(y)`}, {`W2(y)`, `R1(y)`}, {`R2(x)`, `W1(x)`}
+  - All conflicting operations occur in the same order
+
+## Managing concurrency (INCOMPLETE)
 
 - Locking - pessimistic approach
   - Before you do a read or write, need to get a lock for the data item
@@ -503,11 +558,75 @@ Managing concurrency
     - Deadlocks - try and detect it with the scheduler --> break one of the transactions. Can also have timeouts
     - Cascaded abort - can get a dirty read
 
-- Timestamp ordering - TODO
-
 # Elections
 
-# Multicast
+_Coordinator_: some distributed algorithms rely on coordinators to work.
+It's a challenge to decide on which process should be the coordinator.
+Coordinators may change if one fails.
+
+_Elections_: process of deciding who a new coordinator should be.
+
+Determining a coordinator:
+
+- Assume all nodes have a unique id
+- Vote on which non-crashed process has the largest id
+- This process becomes the new coordinator
+
+Desired properties:
+
+- _Safety_: a process either doesn't know the coordinator, or it knows the largest id process
+- _Liveness_: eventually, a process crashes or knows the coordinator (i.e. it doesn't stall)
+
+## Bully Algorithm
+
+Types of messages:
+
+- _Election_: call to election
+- _Answer_: an ACK of election
+- _Coordinator_: result of the election
+
+Assumptions:
+
+- A node knows it's the highest numbered
+- Nodes are able to multicast
+
+Implementation:
+
+1. A process can begin an election if it notices the coordinator has failed (by timeout).
+   It sends an _Election_ message to all higher-numbered processes.
+2. If no _Answer_ message is received, crash
+3. If an _Answer_ message is received, wait for a _Coordinator_ message
+4. If an _Election_ message is received, repeat steps 1-3.
+5. If a process knows it is the highest numbered one, it multicasts to all nodes with _Coordinator_
+
+|             Bully Algorithm             |
+| :-------------------------------------: |
+| ![bully](img/synchronisation/bully.png) |
+
+## Ring Algorithm
+
+Types of messages:
+
+- _Election_: call to election
+- _Coordinator_: result of the election
+
+Assumptions:
+
+- Processes are aligned in a ring (i.e. they can only contact a successor or predecessor)
+
+Implementation:
+
+1. A process can begin an election if it notices the coordinator has failed (by timeout).
+   It sends an _Election_ message to its successor with its id appended.
+2. Every node forwards the election message, appending its own id.
+3. Election is finished when the original process receives an _Election_ message again
+4. The process figures out the coordinator and forwards a _Coordinator_ message
+
+|            Ring Algorithm             |
+| :-----------------------------------: |
+| ![ring](img/synchronisation/ring.png) |
+
+# Multicast (INCOMPLETE)
 
 FIFO multicast - attach a sequence number to every message → ensures messages are in order for every sender
 Causal multicast - messages are causally ordered
