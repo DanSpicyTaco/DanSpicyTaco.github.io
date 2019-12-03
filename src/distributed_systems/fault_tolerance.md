@@ -1,17 +1,20 @@
 # Fault Tolerance <!-- omit in toc -->
 
+# Table of Contents <!-- omit in toc -->
+
 - [Failure](#failure)
   - [Case Study: AWS Failure 2011](#case-study-aws-failure-2011)
-  - [Failures and Faults](#failures-and-faults)
+  - [Terminology](#terminology)
   - [Failure Models](#failure-models)
   - [Detecting Failure](#detecting-failure)
-  - [Fault Tolerance](#fault-tolerance)
+- [Fault Tolerance](#fault-tolerance)
 - [Reliable Communication](#reliable-communication)
   - [Reliable Multicast](#reliable-multicast)
 - [Process resilience](#process-resilience)
+  - [State-Machine Replication](#state-machine-replication)
 - [Recovery](#recovery)
 
-## Failure
+# Failure
 
 Usually want distributed systems to be _dependable_.
 In other words, it needs to handle servers failures and faults well.
@@ -27,18 +30,35 @@ The properties of a dependable distributed system are:
 - _Maintainability_: how easily a failed system can be repaired.
   This includes automatic recovery.
 
-### Case Study: AWS Failure 2011
+## Case Study: AWS Failure 2011
 
-- AWS failure - fault tolerance mechanisms made everything worse and crashed the entire system
-- Network config error - primary network was redirected to secondary network
-- Nodes couldn’t find it’s mirrors (replicas)
-- Volumes were blocked because you couldn’t re-mirror - disk space had run out + secondary network was saturated
-- Control plane server had thread starvation (no threads active) → took down other AZs
-- Potential fixes: make the CPs availability zone aware, decrease timeout length
+_When_: April 21, 2011
 
-### Failures and Faults
+_Where_: EBS (and then RDS) in US East region
 
-Terminology:
+_Length_: Entire region was unavailable for 2 days
+
+_Causes_: reconfiguration error and re-mirroring storm.
+
+_Timeline_:
+
+- A routine network update pushed a network config error to all EBS servers.
+  - The primary network ended up being redirected to the secondary network.
+- Secondary network became saturated.
+- Servers couldn't locate its mirrors due to the saturated network.
+  - When a server can't locate a mirror, it _re-mirrors_ (creates a new mirror).
+- Volumes became blocked because servers couldn't re-mirror, as disk space had run out.
+  - This led to 13% of volumes in one availability zone dropping.
+- Broken volumes led to thread starvation on the _control plane server_ (manager of a region)
+  - Became overloaded with API errors
+  - Crashed other AZs in the same region, leading to an outage in the whole region
+
+_Lesson learnt_:
+
+- Make control plane APIs AZ aware
+- Decrease timeout length to avoid thread starvation
+
+## Terminology
 
 - _Failure_: when a system cannot provide its services in a specified manner.
 - _Error_: the **part of the system** which lead to a failure.
@@ -78,7 +98,7 @@ There are many different types of failures:
 - _Communication failure_: the network (either a link or a node) has failed.
   This can lead to a network partition.
 
-### Failure Models
+## Failure Models
 
 _Failure model_: a model to determine how a component in a distributed system failed.
 By determining the failure model, you can decide how to recover from the failure, if possible.
@@ -105,9 +125,10 @@ This is different to an omission failure, as the server does send a response, bu
 _Arbitrary failure_: system goes into the worst possible state - server sends arbitrary messages at arbitrary times.
 Also known as a _Byzantine failure_.
 
-### Detecting Failure
+## Detecting Failure
 
 _Failure detector_: a service that queries processes to determine if it has failed.
+
 Failure detectors can be reliable or unreliable.
 Can never determine with certainty that a node has failed, it can only be _unsuspected_.
 If the query to a node returns, the detector will know that the process hasn't failed by the time the message is sent - hence the _unsuspected_ state.
@@ -125,7 +146,7 @@ It's possible to ignore messages from a _suspected_ process.
 The process can restart and send a new message to neighbour nodes.
 The neighbour nodes can add it back to the network again.
 
-### Fault Tolerance
+# Fault Tolerance
 
 _Fault tolerance_: the system can provide its service, even in the presence of faults.
 The ultimate goal is to handle partial failure without affecting the overall performance.
@@ -155,7 +176,7 @@ Three processes compute the same action _A_.
 Then the voters _V_ take the answer with the majority vote and store the result.
 If one process fails, the voters will still take the correct answer, thereby masking the failed process.
 
-## Reliable Communication
+# Reliable Communication
 
 Communication through the network is always going to be _lossy_.
 Trying to prevent communication failures is not worth it.
@@ -165,7 +186,7 @@ Use a reliable transport protocol (i.e. TCP) to create reliable E2E communicatio
 TCP doesn't solve lossy communication though, it only masks omission failures.
 Servers are still prone to crash failures if they use TCP.
 
-### Reliable Multicast
+## Reliable Multicast
 
 _Reliable multicast_: multicast a message with a SeqNo attached to it.
 All nodes reply with an ACK of the last message received.
@@ -177,17 +198,29 @@ If a node replies with an ACK that is not equal to the last sent SeqNo, the serv
 
 Reliable multicast is prone to _feedback implosion_, where the server receives so many ACKs, it crashes.
 This can be solved by sending a NACK instead.
+
 Server load can be reduced further by sending a multicast NACK to all other nodes.
+
 However, the system has to deal with another multicast (essentially nested multicast), and nodes who received the message successfully will be unnecessarily interrupted.
 
-## Process resilience
+# Process resilience
 
 _Process resilience_: protection from process failure.
 
+Have resilience in _groups_ of processes as a single abstraction.
+A group should contain identical processes, and membership can be dynamic.
 
-- Have resilience in groups → copies of the same process running on different machines
-- Need 2k+1 replicas for byzantine failures, as the components can lie about their state, and in the worst case, agree about lying about their state
-- Majority of replicas have the same value
+To survive $$k$$ replicas crashing, you need:
+
+- _$$k+1$$_ replicas for fail-silent failures.
+- _$$2k + 1$$_ replicas for Byzantine failures.
+  - This is because in the worst case, components can agree about lying about their state.
+  - Therefore, you need the majority of replicas to have the correct value.
+
+## State-Machine Replication
+
+_State-machine replica_: 
+
 - Non-determinism for replicated state machines:
 - Time - If the machine requires time, you can get slightly different states
 - Side effects - something else running on the machine may change the memory
@@ -197,4 +230,5 @@ _Process resilience_: protection from process failure.
 - Need to see view change (group membership changes) and messages in the same order as everyone else (total order), otherwise the group will be out of synch
 - Agreement - is very difficult
 
-## Recovery
+
+# Recovery
