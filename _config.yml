@@ -1,12 +1,6 @@
 # Theme
 theme: jekyll-theme-minimal # https://github.com/pages-themes/minimal
 
-defaults:
-  - scope:
-      path: "assets/img"
-    values:
-      image: true
-
 # Site settings
 title: docs@DanSpicyTaco
 description: >
