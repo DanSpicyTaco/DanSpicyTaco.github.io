@@ -6,3 +6,12 @@ main:
     url: "/projects/"
   - title: "Blog"
     url: /blog/
+
+# project links
+projects:
+  - title: "Projects"
+    children:
+      - title: "MoneyLoop Website"
+        url: /projects/moneyloop-website/
+      - title: "Unicorn-CA"
+        url: /projects/moneyloop-website/

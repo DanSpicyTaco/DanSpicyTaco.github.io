@@ -23,7 +23,7 @@ name: "Daniel Latimer"
 description: "Personal website and blog for DanSpicyTaco"
 url: "https://danspicytaco.github.io"
 baseurl:
-repository: "DanSpicyTaco/docs"
+repository: "DanSpicyTaco/DanSpicyTaco.github.io"
 logo: "/assets/images/favicon-32x32.png"
 breadcrumbs: false
 words_per_minute: 200
@@ -41,7 +41,14 @@ twitter:
 author:
   name: "Daniel Latimer"
   avatar: "/assets/images/profile_picture.jpg"
-  bio: "Software Developer at MoneyLoop | Casual Academic at UNSW"
+  bio: >
+    👨‍💻 Software Developer at MoneyLoop
+    <br/>
+    👨‍🏫 Casual Academic at UNSW
+    <br/>
+    🎓 BE. (Mechatronics) (Honours)
+    <br/>
+    🎓 BSc. (Computer Science)
   location: "Sydney, Australia"
   links:
     - label: "LinkedIn"
@@ -184,6 +191,12 @@ compress_html:
   ignore:
     envs: development
 
+# Collections
+collections:
+  projects:
+    output: true
+    permalink: /:collection/:path/
+
 # Defaults
 defaults:
   # _pages
@@ -200,8 +213,19 @@ defaults:
       type: posts
     values:
       layout: single
-      author_profile: false
+      author_profile: true
       read_time: true
       comments: false
       share: true
       related: true
+
+  # _projects
+  - scope:
+      path: ""
+      type: projects
+    values:
+      layout: single
+      author_profile: true
+      share: true
+      sidebar:
+        nav: "projects"

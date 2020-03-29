@@ -1,3 +1,7 @@
+---
+categories: [Distributed Systems]
+---
+
 # Communication <!-- omit in toc -->
 
 # Table of Contents <!-- omit in toc -->
@@ -229,6 +233,7 @@ _RMI_ - invoke methods on remote objects
 ## Group-based Communication
 
 _Group-based communication_: send a message to a group of machines, instead of one
+
 - Issues include message ordering and message reliability
 
 _If one machine doesn’t receive a message, should it be resent to everyone?_
@@ -245,6 +250,7 @@ _Multicast_: send a message to a specific group of machines
 ## Event-based Communication
 
 _Event-based communication_: abstract senders and receivers into events
+
 - Senders publish events, receivers subscribe to events
 - Loose spatial and temporal coupling
 - _E.g._ firefighter services subscribe to a fire event, when something is on fire and publishes a fire event, all firefighter services will be notified
@@ -252,7 +258,9 @@ _Event-based communication_: abstract senders and receivers into events
 ## Isochronous Communication
 
 _Isochronous communication_: communication that has a minimum and maximum receive time (e.g. streams - video and audio channels)
+
 - Data itself has tight spatial and temporal coupled
 
 _Token bucket model_: token is added every specified second, data is sent with a token
+
 - If no token is available, data can’t be sent out; if no data is available, tokens aren’t generated

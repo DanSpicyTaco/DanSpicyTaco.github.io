@@ -1,10 +1,14 @@
+---
+categories: [Security]
+---
+
 # Network Architectures and Security
 
 ## Network Architectures
 
-|                  Internet Architecture                   |
-| :------------------------------------------------------: |
-| ![internet architectures](img/internet_architecture.png) |
+|                   Internet Architecture                    |
+| :--------------------------------------------------------: |
+| ![internet architectures](./img/internet_architecture.png) |
 
 |                  Cellular Architecture                   |
 | :------------------------------------------------------: |

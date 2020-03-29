@@ -1,19 +1,7 @@
-# System Architecture <!-- omit in toc -->
-
-# Table of Contents <!-- omit in toc -->
-
-- [Client-Server Architecture](#client-server-architecture)
-  - [Erlang Example](#erlang-example)
-- [Peer to Peer Architecture](#peer-to-peer-architecture)
-  - [DHT Example: Chord DHT](#dht-example-chord-dht)
-- [Hybrid Architectures](#hybrid-architectures)
-  - [Superpeer Networks](#superpeer-networks)
-  - [Collaborative Distributed Systems](#collaborative-distributed-systems)
-  - [Edge-Server Systems](#edge-server-systems)
-- [Process Architecture](#process-architecture)
-- [Server Architecture](#server-architecture)
-  - [Clustered Servers](#clustered-servers)
-  - [Request Switching](#request-switching)
+---
+categories: [Distributed Systems]
+toc: true
+---
 
 **System architecture: figuring out where to place machines and the servers on them.**
 
