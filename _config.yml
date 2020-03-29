@@ -35,7 +35,7 @@ search_provider: lunr
 
 # Social Sharing
 twitter:
-  username: "DanSpicyTaco1"
+  username: "DanSpicyTaco"
 
 # Site Author
 author:
@@ -56,7 +56,7 @@ author:
       url: "https://www.linkedin.com/in/daniel-latimer/"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
-      url: "https://twitter.com/DanSpicyTaco1"
+      url: "https://twitter.com/DanSpicyTaco"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/DanSpicyTaco"
@@ -69,7 +69,7 @@ footer:
       url: "https://www.linkedin.com/in/daniel-latimer/"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
-      url: "https://twitter.com/DanSpicyTaco1"
+      url: "https://twitter.com/DanSpicyTaco"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/DanSpicyTaco"
