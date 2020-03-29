@@ -6,9 +6,7 @@ categories: [Security]
 
 ## Network Architectures
 
-|                   Internet Architecture                    |
-| :--------------------------------------------------------: |
-| ![internet architectures](./img/internet_architecture.png) |
+{% include figure image_path="assets/images/Security/internet_architecture.png" alt="internet architecture" caption="Internet Architecture." %}
 
 |                  Cellular Architecture                   |
 | :------------------------------------------------------: |
