@@ -1,12 +1,16 @@
 ---
 permalink: /about/
+header:
+  overlay_image: /assets/images/tacos/about_taco.gif
+  caption: "[@100soft, GIPHY](https://media.giphy.com/media/3o7TKCTt7cNHg10utO/source.gif)"
+  class: repeat_background
 ---
 
-Hey there!
+_Hey there!_
 
 I'm a final year Mechatronic Engineering & Computer Science student and a part-time software developer.
-I want to be a frontend engineer when I graduate - making things look pretty is my passion!
-In my spare time I like to garden, hang out in the park and make robots!
+I want to be a frontend engineer when I graduate - making things look great is my passion!
+My hobbies include gardening, chilling out in my local park, and making awesome robots 🤘🚀
 
 ## Experience
 

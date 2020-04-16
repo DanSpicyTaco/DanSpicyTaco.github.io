@@ -1,4 +1,4 @@
----
+<!-- ---
 title: "MoneyLoop Wesbite"
 excerpt: "Revamping the MoneyLoop website with React"
 header:
@@ -6,4 +6,4 @@ header:
 ---
 
 In January 2020, I was tasked with revamping the MoneyLoop website with React.
-The old website was not mobile compatible.
+The old website was not mobile compatible. -->

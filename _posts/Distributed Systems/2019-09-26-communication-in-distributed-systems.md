@@ -1,83 +1,51 @@
 ---
 categories: [Distributed Systems]
+excerpt: "What is the best way to get a bunch of computers to communicate with each other?"
+toc: true
+header:
+  overlay_image: /assets/images/posts/distributed/communication_header.jpg
+  caption: "Photo Credit: [technologymoon](https://technologymoon.com/wp-content/uploads/2019/12/Canva-Share-and-send-media-files-between-phones.-Paper-planes-letter-sent-from-phone-to-phone-technology-linking-people-1536x1025.jpg)"
 ---
 
-# Communication <!-- omit in toc -->
+Turns out communication in distributed systems is pretty difficult.
+Separate computers don't have access to each other's memory; they need to pass messages instead.
 
-# Table of Contents <!-- omit in toc -->
+> A computer communicating with another through `send()` and `receive()` functions is called _message passing_.
 
-- [Communication in a Distributed System](#communication-in-a-distributed-system)
-  - [Communication Modes](#communication-modes)
-    - [Data-oriented Communication](#data-oriented-communication)
-    - [Control-oriented Communication](#control-oriented-communication)
-  - [Communication Operations](#communication-operations)
-    - [Synchronous Operation](#synchronous-operation)
-    - [Asynchronous Operation](#asynchronous-operation)
-  - [Terminology](#terminology)
-- [Communication Abstractions](#communication-abstractions)
-  - [Message-orientated Communication](#message-orientated-communication)
-  - [Request-reply Communication](#request-reply-communication)
-    - [RPC](#rpc)
-    - [RMI](#rmi)
-  - [Group-based Communication](#group-based-communication)
-  - [Event-based Communication](#event-based-communication)
-  - [Isochronous Communication](#isochronous-communication)
+This post will cover the fundamentals of message passing, as well as a couple of common abstractions we can use on top of it.
 
-# Communication in a Distributed System
+## What's in a message?
 
-Computers don't have access to each other's memory - need to pass messages between each other to communicate.
+Messages will contain either _data_ or _control_.
+Which one you use will depend on the requirements of your system.
 
-_Message passing_: essentially send() and receive() functions.
+In _data-oriented communication_, data is requested or sent in messages.
+Most messages we have use data-oriented communication.
+A famous example is the _HTTP protocol_, where a client would request a file (the data) at a certain location (e.g. `/index.html`), and the server would respond with the appropriate file (or error).
+Data-oriented communication is good when you have files or similar data you can pass around.
+However, it isn't much help if you need to find the answer to a calculation, which is why we have control-oriented communication.
 
-Message passing provides synchronous/asynchronous communication & transient communication.
-There is no buffer in send() or receive() to store messages.
+In _control-oriented communication_, control directives are sent, rather than data.
+Essentially, the sender asks the receiver to compute some function and return the result.
+For example, a sender can request `sum(2, 5)` and a receiver should reply with `7`.
+The sender has requested the receiver to go away and calculate `sum(2,5)` and return the answer.
+Obviously, the sender can calculate this itself, but using control-oriented communication comes in handy when you need to do a lot of calculations as fast as possible.
+Instead of doing all the calculations yourself, you can just ask a bunch of computers to go and calculate a part of it, then come back and assemble the answer.
+In fact, this is the basis of many real-world divide and conquer solutions, like [this one](https://www.programmableweb.com/api/divide-and-conquer-multiple-sequence-alignment-rpc-api/articles).
 
-_Coupling_: dependency between a sender and a receiver - used as a metric to assess distributed communication.
+## Types of communication
 
-Types of coupling:
+There are many different types of message passing in distributed systems.
+Often, we can combine these types to create really efficient ways of communicating.
+Let's go through the most common types.
 
-- _Temporal_
-- _Spatial_
-- _Semantic_ (content syntax)
-- _Platform_
+**Synchronous**: The sender assumes the receiver is active, and will block until a reply is received.
+The receiver will wait for requests, process them and returns them.
+Both parties need to be active and know about each other.
 
-## Communication Modes
+**Asynchronous**: the sender does not block, the receiver does not have to be active.
+Suitable when the sender can’t do any other tasks while waiting for the receiver to reply
 
-_Communication modes_: method of communicating
-
-### Data-oriented Communication
-
-_Data-oriented communication_: exchange data between nodes.
-
-- Data or requests for data is sent in messages, no processing is done in other nodes.
-- _E.g_ shared address spaces - communicate via sending addresses
-
-### Control-oriented Communication
-
-_Control-oriented communication_: transfers control with communication.
-
-- Processing may be done somewhere else.
-- Assumes receiver will go and do something.
-- _E.g_ RPC
-
-## Communication Operations
-
-_Communication operations_: actions the sender/receiver does when a message is sent/received
-
-### Synchronous Operation
-
-_Synchronous operation_: both nodes must be active
-
-- Sender blocks until a reply is received
-- Receiver waits for requests, processes them, and returns them
-- **Tight temporal coupling** - both parties need to be active
-- **Tight spatial coupling** - both parties need to know about each other
-
-### Asynchronous Operation
-
-_Asynchronous operation_: sender does not block, the receiver does not have to be active
-
-- Suitable when the sender can’t do any other tasks while waiting for the receiver to reply
 - _E.g._ transferring money - want to block until you get a confirmation reply
 - **Loose temporal coupling** - receiver does not have to be active
 - **Tight spatial coupling** - both parties need to know about each other
@@ -92,8 +60,6 @@ Can make asynchronous communication from synchronous messages by:
 1. Spawning a new thread
 2. Sending a synchronous send/receive
 3. Returning to the main thread when a message has been received
-
-## Terminology
 
 _Transient communication_: message is lost if the receiver does not accept it immediately
 
@@ -121,9 +87,18 @@ _Indirect-addressing_: message is sent to anyone
 - E.g. broadcast
 - **Loose spatial coupling**
 
-|  Combinations of Communication Types  |
-| :-----------------------------------: |
-| ![types](img/communication/types.png) |
+{% include figure image_path="assets/images/posts/distributed/communication_types.png" alt="Communication Types" caption="Combinations of Communication Types." %}
+
+## Coupling - assessing communication
+
+We usually use _coupling_ as a metric to assess distributed communication.
+You can think of coupling as the dependency between a sender and a receiver.
+There are different types of coupling:
+
+- _Temporal_: are the messages dependent on time? E.g. does the receiver have to send a message back immediately?
+- _Spatial_: do both parties need to be aware of each other's existence?
+- _Semantic_: how much structure does the message require to be understood by both parties?
+- _Platform_: can we use any platform to pass messages?
 
 # Communication Abstractions
 
