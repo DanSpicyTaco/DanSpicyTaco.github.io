@@ -1,5 +1,5 @@
 <!-- ---
-title: "MoneyLoop Wesbite"
+title: "MoneyLoop Website"
 excerpt: "Revamping the MoneyLoop website with React"
 header:
   teaser: /assets/images/moneyloop-website.svg

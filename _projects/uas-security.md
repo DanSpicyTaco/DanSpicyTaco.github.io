@@ -2,10 +2,10 @@
 title: "UAS Security"
 excerpt: "Basically, hacking a drone for my thesis"
 toc: true
-header:
-  teaser: /assets/images/projects/uas/header.png
-  overlay_image: /assets/images/projects/uas/header.png
-  caption: "[Hackaday](https://hackaday.com/wp-content/uploads/2016/05/agriculture1.jpg?w=800)"
+# header:
+#   teaser: /assets/images/projects/uas/header.png
+#   overlay_image: /assets/images/projects/uas/header.png
+#   caption: "[Hackaday](https://hackaday.com/wp-content/uploads/2016/05/agriculture1.jpg?w=800)"
 ---
 
 # Introduction
