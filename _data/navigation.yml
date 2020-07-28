@@ -1,17 +1,8 @@
 # main links
 main:
   - title: "About"
-    url: /about/
+    url: /
   - title: "Projects"
     url: "/projects/"
-  - title: "Blog"
-    url: /blog/
-
-# project links
-projects:
-  - title: "Projects"
-    children:
-      - title: "MoneyLoop Website"
-        url: /projects/moneyloop-website/
-      - title: "Unicorn-CA"
-        url: /projects/unicorn-ca/
+  # - title: "Blog"
+  #   url: /blog/

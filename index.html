@@ -1,8 +1,12 @@
 ---
-layout: home
+layout: single
 author_profile: true
+toc: true
 header:
-  overlay_image: /assets/images/tacos/home_taco.gif
-  caption: "[@jonasmosesson, GIPHY](https://media.giphy.com/media/l3q2tvaYp4KseN22A/giphy.gif)"
+  overlay_image: /assets/images/tacos/about_taco.gif
+  caption: "[@100soft, GIPHY](https://media.giphy.com/media/3o7TKCTt7cNHg10utO/source.gif)"
   class: repeat_background
 ---
+
+{% capture my_include %}{% include_relative _pages/about.md %}{% endcapture %}
+{{ my_include | markdownify }}

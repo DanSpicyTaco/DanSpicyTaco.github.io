@@ -1,11 +1,3 @@
----
-permalink: /about/
-header:
-  overlay_image: /assets/images/tacos/about_taco.gif
-  caption: "[@100soft, GIPHY](https://media.giphy.com/media/3o7TKCTt7cNHg10utO/source.gif)"
-  class: repeat_background
----
-
 _Hey there!_
 
 I'm a final year Mechatronic Engineering & Computer Science student and a part-time software developer.
@@ -14,13 +6,13 @@ My hobbies include gardening, chilling out in my local park, and making awesome 
 
 ## Experience
 
-### Software Developer
+### Software Engineer
 
 <img src="/assets/images/moneyloop.png" alt="moneyloop" width="100" height="100" class="align-left"/>
 
 **MoneyLoop, Sydney Australia • Part-time**
 
-_May 2019 - Present_
+_May 2019 - July 2020_
 
 - Responsible for building the MoneyLoop website in React, introducing a responsive layout and modern design.
 - Decreased page load time for the internal Loan Management System by optimising database queries.
@@ -34,9 +26,10 @@ _May 2019 - Present_
 
 _February 2020 - Present_
 
-- Tutor for Security Engineering & Cyber Security (2020 T1).
-- Tutor for Modelling & Control of Mechatronic Systems (2020 T1).
-- Demonstrator for Engineering Design & Innovation (2020 T1).
+- Tutor for Robot Design, MTRN4110 (2020 T2).
+- Tutor for Security Engineering & Cyber Security, COMP6441 (2020 T1).
+- Tutor for Modelling & Control of Mechatronic Systems, MTRN3500 (2020 T1).
+- Demonstrator for Engineering Design & Innovation, ENGG1000 (2020 T1).
 
 ### Research Assistant
 

@@ -4,7 +4,7 @@ layout: categories
 permalink: /blog/
 author_profile: true
 header:
-  overlay_image: /assets/images/tacos/blog_taco.gif
-  caption: "[@cindysuen, GIPHY](https://media.giphy.com/media/2ZqbXchJzeomXAo83XG/giphy.gif)"
+  overlay_image: /assets/images/tacos/home_taco.gif
+  caption: "[@jonasmosesson, GIPHY](https://media.giphy.com/media/l3q2tvaYp4KseN22A/giphy.gif)"
   class: repeat_background
 ---
